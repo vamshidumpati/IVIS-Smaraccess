@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval" >
+
+    <solid android:color="@color/bottom_navigation_selection_txt" />
+
+    <size
+        android:height="23dp"
+        android:width="23dp" />
+    
+   
+
+</shape>

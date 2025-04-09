@@ -1,0 +1,22 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Shape for the solid color at the bottom -->
+    <item android:top="10dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/site_count" />
+
+            <stroke android:color="@color/bg_line" android:width="2dp" />
+            <!-- Add shadow -->
+            <padding android:left="2dp" android:right="2dp" android:bottom="2dp" />
+        </shape>
+    </item>
+
+    <!-- Shape for the white top -->
+    <item android:bottom="10dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/white" />
+
+        </shape>
+    </item>
+
+</layer-list>

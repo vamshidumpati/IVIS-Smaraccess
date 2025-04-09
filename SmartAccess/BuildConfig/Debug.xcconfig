@@ -1,0 +1,34 @@
+//
+//  Debug.xcconfig
+//  HSense
+//
+//  Created by Ashok on 2/23/21.
+//  Copyright © 2021 HelixSense. All rights reserved.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+
+#include "Pods/Target Support Files/Pods-SmartAccess/Pods-SmartAccess.debug.xcconfig"
+
+API_BASE_URL = https:/$()/dev2-v2.iviscloud.net //api-preprod.helixsense.com
+
+API_CLIENT_ID = B4rmAr2HzoY3EuXozmGaPUup3WiMn8
+API_CLIENT_SECRET = lTBqZcry0rtq5vzLfOit1AQSHXCBc2
+API_VERSION = v4
+API_GRANT_TYPE = password
+API_REFRESH_TOKRN = refresh_token
+API_APP_TOKEN = 45g1FGWa8ILBJQl9sNEaevmYo2TgYP
+
+ONE_SIGNAL_APP_ID = 194dcf80-f477-4fe2-be0a-7b567f3f6fea
+MSAL_CLIENT_ID = f1e2f860-67c7-4a00-9eab-c8ba861dcf3d
+APP_NAME = Smart Access
+PRODUCT_BUNDLE_IDENTIFIER = com.app.hsensesurvey
+APP_MARKETING_VERSION = 1.1
+APP_BUILD_VERSION = 2
+
+
+
+
+

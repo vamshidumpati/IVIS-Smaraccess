@@ -1,0 +1,12 @@
+{
+  "data" : [
+    {
+      "filename" : "modal_theme.xml",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

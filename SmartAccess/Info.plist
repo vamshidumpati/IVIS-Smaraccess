@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_APP_TOKEN</key>
+	<string>$(API_APP_TOKEN)</string>
+	<key>API_BASE_URL</key>
+	<string>$(API_BASE_URL)</string>
+	<key>API_GRANT_TYPE</key>
+	<string>$(API_GRANT_TYPE)</string>
+	<key>API_REFRESH_TOKRN</key>
+	<string>$(API_REFRESH_TOKRN)</string>
+	<key>API_VERSION</key>
+	<string>$(API_VERSION)</string>
+	<key>APP_MARKETING_VERSION</key>
+	<string>$(APP_MARKETING_VERSION)</string>
+	<key>APP_NAME</key>
+	<string>$(APP_NAME)</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Lato-Italic.ttf</string>
+		<string>Lato-LightItalic.ttf</string>
+		<string>Lato-Thin.ttf</string>
+		<string>Lato-Bold.ttf</string>
+		<string>Lato-Black.ttf</string>
+		<string>Lato-Regular.ttf</string>
+		<string>Lato-BlackItalic.ttf</string>
+		<string>Lato-BoldItalic.ttf</string>
+		<string>Lato-Light.ttf</string>
+		<string>Lato-Heavy.ttf</string>
+		<string>Lato-Semibold.ttf</string>
+		<string>Lato-Medium.ttf</string>
+	</array>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UISceneConfigurations</key>
+		<dict>
+			<key>UIWindowSceneSessionRoleApplication</key>
+			<array>
+				<dict>
+					<key>UISceneConfigurationName</key>
+					<string>Default Configuration</string>
+					<key>UISceneDelegateClassName</key>
+					<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
+					<key>UISceneStoryboardFile</key>
+					<string>Main</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
+</dict>
+</plist>

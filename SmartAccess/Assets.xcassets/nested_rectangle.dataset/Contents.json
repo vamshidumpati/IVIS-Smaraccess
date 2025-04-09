@@ -1,0 +1,12 @@
+{
+  "data" : [
+    {
+      "filename" : "nested_rectangle.xml",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

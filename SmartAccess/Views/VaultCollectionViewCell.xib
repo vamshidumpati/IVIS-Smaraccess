@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="Lato-Medium.ttf">
+            <string>Lato-Medium</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" restorationIdentifier="VaultCollectionViewCell" reuseIdentifier="VaultCollectionViewCell" id="gTV-IL-0wX" customClass="VaultCollectionViewCell" customModule="SmartAccess" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="215" height="117"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="215" height="117"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="6zM-hT-405">
+                        <rect key="frame" x="0.0" y="0.0" width="215" height="117"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Hj5-VO-C6S">
+                                <rect key="frame" x="2" y="2" width="211" height="113"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="GrD-t8-uBP">
+                                        <rect key="frame" x="0.0" y="110" width="211" height="3"/>
+                                        <color key="backgroundColor" red="0.086274509803921567" green="0.5725490196078431" blue="0.87450980392156863" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="3" id="T3a-qP-LDe"/>
+                                        </constraints>
+                                    </view>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="others" translatesAutoresizingMaskIntoConstraints="NO" id="trX-VA-VXd">
+                                        <rect key="frame" x="90.666666666666671" y="41.666666666666664" width="30" height="29.999999999999993"/>
+                                        <color key="tintColor" red="0.086274509803921567" green="0.5725490196078431" blue="0.87450980392156863" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="30" id="JUE-DC-Olc"/>
+                                            <constraint firstAttribute="height" constant="30" id="K9X-Aw-zUw"/>
+                                        </constraints>
+                                        <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="small"/>
+                                    </imageView>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4O7-56-c5I">
+                                        <rect key="frame" x="176" y="10" width="25" height="25"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="25" id="jOZ-Ft-cRo"/>
+                                            <constraint firstAttribute="width" constant="25" id="lyl-wk-xsl"/>
+                                        </constraints>
+                                        <color key="tintColor" red="0.086274509803921567" green="0.5725490196078431" blue="0.87450980392156863" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="plain" image="checkmark.circle" catalog="system"/>
+                                    </button>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Vamshi" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="h2j-bE-wBn">
+                                        <rect key="frame" x="5" y="79" width="201" height="20"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="20" id="4NS-qC-OOQ"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" name="Lato-Medium" family="Lato" pointSize="14"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstItem="GrD-t8-uBP" firstAttribute="leading" secondItem="Hj5-VO-C6S" secondAttribute="leading" id="BT2-El-tx5"/>
+                                    <constraint firstAttribute="bottom" secondItem="GrD-t8-uBP" secondAttribute="bottom" id="Czv-3t-RIc"/>
+                                    <constraint firstAttribute="trailing" secondItem="4O7-56-c5I" secondAttribute="trailing" constant="10" id="OJs-hw-Jg0"/>
+                                    <constraint firstItem="trX-VA-VXd" firstAttribute="centerX" secondItem="Hj5-VO-C6S" secondAttribute="centerX" id="Vir-mi-P0y"/>
+                                    <constraint firstItem="4O7-56-c5I" firstAttribute="top" secondItem="Hj5-VO-C6S" secondAttribute="top" constant="10" id="aEi-EC-DK0"/>
+                                    <constraint firstItem="h2j-bE-wBn" firstAttribute="leading" secondItem="Hj5-VO-C6S" secondAttribute="leading" constant="5" id="cVd-o6-24A"/>
+                                    <constraint firstAttribute="trailing" secondItem="h2j-bE-wBn" secondAttribute="trailing" constant="5" id="eVW-OU-vEh"/>
+                                    <constraint firstAttribute="trailing" secondItem="GrD-t8-uBP" secondAttribute="trailing" id="nUH-XN-BP1"/>
+                                    <constraint firstItem="trX-VA-VXd" firstAttribute="centerY" secondItem="Hj5-VO-C6S" secondAttribute="centerY" id="tlL-gw-gQx"/>
+                                    <constraint firstItem="h2j-bE-wBn" firstAttribute="top" secondItem="trX-VA-VXd" secondAttribute="bottom" constant="7.3333333333333428" id="zD9-9O-DfK"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" red="0.95294117647058818" green="0.95294117647058818" blue="0.95294117647058818" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="Hj5-VO-C6S" firstAttribute="top" secondItem="6zM-hT-405" secondAttribute="top" constant="2" id="ANG-TG-rOe"/>
+                            <constraint firstAttribute="trailing" secondItem="Hj5-VO-C6S" secondAttribute="trailing" constant="2" id="JJF-p1-dma"/>
+                            <constraint firstItem="Hj5-VO-C6S" firstAttribute="leading" secondItem="6zM-hT-405" secondAttribute="leading" constant="2" id="ROe-2a-Idk"/>
+                            <constraint firstAttribute="bottom" secondItem="Hj5-VO-C6S" secondAttribute="bottom" constant="2" id="epr-i9-GKn"/>
+                        </constraints>
+                    </view>
+                </subviews>
+            </view>
+            <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
+            <constraints>
+                <constraint firstItem="6zM-hT-405" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="IBA-9x-zRQ"/>
+                <constraint firstAttribute="trailing" secondItem="6zM-hT-405" secondAttribute="trailing" id="On6-w6-HIB"/>
+                <constraint firstItem="6zM-hT-405" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="Xt6-XD-4cw"/>
+                <constraint firstAttribute="bottom" secondItem="6zM-hT-405" secondAttribute="bottom" id="pEX-xf-CLX"/>
+            </constraints>
+            <size key="customSize" width="215" height="117"/>
+            <connections>
+                <outlet property="checkBtn" destination="4O7-56-c5I" id="L8H-ya-Jwj"/>
+                <outlet property="itemImage" destination="trX-VA-VXd" id="m3b-0q-tZu"/>
+                <outlet property="itemName" destination="h2j-bE-wBn" id="qng-Or-XZ7"/>
+            </connections>
+            <point key="canvasLocation" x="199.23664122137404" y="42.605633802816904"/>
+        </collectionViewCell>
+    </objects>
+    <resources>
+        <image name="checkmark.circle" catalog="system" width="128" height="123"/>
+        <image name="others" width="74" height="73"/>
+    </resources>
+</document>

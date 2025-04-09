@@ -1,0 +1,12 @@
+{
+  "data" : [
+    {
+      "filename" : "rectangle_theme.xml",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

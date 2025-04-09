@@ -1,0 +1,20 @@
+<!-- nested_rectangle.xml -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Outer rectangle -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/black" /> <!-- Color of outer rectangle -->
+        </shape>
+    </item>
+
+    <!-- Inner rectangle -->
+    <item
+        android:left="8dp"
+        android:top="8dp"
+        android:right="8dp"
+        android:bottom="8dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/white" /> <!-- Color of inner rectangle -->
+        </shape>
+    </item>
+</layer-list>

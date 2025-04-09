@@ -1,0 +1,12 @@
+{
+  "data" : [
+    {
+      "filename" : "login_bgm.xml",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
