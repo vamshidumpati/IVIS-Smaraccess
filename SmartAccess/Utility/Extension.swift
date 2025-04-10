@@ -141,3 +141,57 @@ extension UIColor {
         self.init(red: red, green: green, blue: blue, alpha: 1.0)
     }
 }
+
+extension UserDefaults {
+    enum Keys {
+        static let customerId = "customer-id"
+        static let customerName = "customer-name"
+        static let loginId = "login-id"
+        static let tenantId = "tenant-id"
+        static let siteId = "site-id"
+        static let siteGroupId = "sitegroup-id"
+        static let token = "Authorization"
+    }
+    
+    // MARK: - Getters
+    
+    var customerId: String? {
+        string(forKey: Keys.customerId)
+    }
+    
+    var customerName: String? {
+        string(forKey: Keys.customerName)
+    }
+    
+    var loginId: String? {
+        string(forKey: Keys.loginId)
+    }
+    
+    var tenantId: String? {
+        string(forKey: Keys.tenantId)
+    }
+    
+    var siteId: String? {
+        string(forKey: Keys.siteId)
+    }
+    
+    var siteGroupId: String? {
+        string(forKey: Keys.siteGroupId)
+    }
+    
+    var authToken: String? {
+        string(forKey: Keys.token)
+    }
+    
+    // MARK: - Setters
+    
+    func setCustomerId(_ value: String) {
+        set(value, forKey: Keys.customerId)
+    }
+    
+    func setCustomerName(_ value: String) {
+        set(value, forKey: Keys.customerName)
+    }
+    
+    // ... add setters for other properties following the same pattern
+}

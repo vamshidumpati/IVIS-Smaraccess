@@ -20,10 +20,8 @@ class LoginViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        
-        usernameTF.text = "MLI1123"
-        passwordTF.text = "Ivis@123"
-        
+        usernameTF.text = "Vamcdumpeta"
+        passwordTF.text = "Apple@123"
     }
     
     override func viewDidLayoutSubviews() {
@@ -129,7 +127,7 @@ class LoginViewController: UIViewController {
     func NavigateToDashboard() {
         DispatchQueue.main.async {
             let tabBarController = MenuViewController()
-            tabBarController.selectedIndex = 0
+            tabBarController.selectedIndex = 1
             
             if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                let sceneDelegate = windowScene.delegate as? SceneDelegate,

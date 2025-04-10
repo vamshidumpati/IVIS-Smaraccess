@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 class NetworkManager: NSObject {
     static let grantType = Environment.grantType
@@ -28,6 +29,20 @@ class NetworkManager: NSObject {
                 request.addValue("\(value)", forHTTPHeaderField: key)
             }
         }
+        let customerName = DataStore.shared.userAuth?.results.mappedCustomers[0].customerName
+        let customerID = DataStore.shared.userAuth?.results.mappedCustomers[0].pkCustomerId
+        let fkTenantId = DataStore.shared.userAuth?.results.mappedCustomers[0].fkTenantId
+        let siteID = DataStore.shared.userAuth?.results.mappedGroups[0].siteId
+        let siteGroupID = DataStore.shared.userAuth?.results.mappedGroups[0].siteGroupId
+        let loginID = DataStore.shared.userAuth?.results.username
+        let accessToken = DataStore.shared.userAuth?.results.accessToken ?? ""
+       // request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        //request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        request.setValue(fkTenantId?.description ?? "null", forHTTPHeaderField: "Tenant-Id")
+        request.setValue(siteGroupID?.description ?? "null", forHTTPHeaderField: "Sitegroup-Id")
+        request.setValue(customerID?.description ?? "null", forHTTPHeaderField: "Customer-Id")
+        request.setValue(loginID?.description ?? "null", forHTTPHeaderField: "Login-Id")
+        request.setValue(siteID?.description ?? "null", forHTTPHeaderField: "Site-Id")
         //let boundary = generateBoundaryString()
         //let formData = self.getMultiPartFormData(params: requestBody ?? [:], boundary: boundary)
         if payLoadFlag{
@@ -286,7 +301,7 @@ class NetworkManager: NSObject {
         customerName: String,
         siteGroupId: String? = nil,
         siteId: String? = nil,
-        tenantId: String = "1",
+        tenantId: String,
         completion: @escaping (Result<SiteResponseModel, Error>) -> Void
     ) {
         let baseURL = "\(Environment.baseURL)" + "/api/client-portal/site-list?user=\(userName)"
@@ -332,6 +347,45 @@ class NetworkManager: NSObject {
                 completion(.failure(error))
             }
         }.resume()
+    }
+    
+    static func getUserProfileImage(completion: @escaping (UIImage?,Error?) -> Void) {
+        let route = "/api/userprofile?&action=avatar"
+        self.call(route: route, requestType: "GET", requestBody: [:]) { error, result in
+            if let error = error {
+                print("Error: \(error)")
+                completion(nil, error.description as? Error)
+                return
+            }
+
+            guard let data = result as? Data else {
+                print("Failed to cast result to Data")
+                completion(nil, error?.description as? Error)
+                return
+            }
+
+            let image = UIImage(data: data)
+            completion(image,nil)
+        }
+    }
+    
+    static func getUserProfileInformation(completion: @escaping(_ error:String) -> Void){
+        let route = "/api/userprofile"
+        self.call(route: route, requestType: "GET", requestBody: [:]) { error, result in
+            if let error = error {
+                print("Error: \(error)")
+                completion(error)
+                return
+            }
+            
+            do {
+                let decoded = try JSONDecoder().decode(UserProfile.self, from: result as! Data)
+                DataStore.shared.userInfo = decoded.results
+                completion("")
+            } catch {
+                completion(error.localizedDescription)
+            }
+        }
     }
 }
 

@@ -12,7 +12,6 @@ class MenuViewController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTabs()
-        selectedIndex = 0 // 👈 Default to Home tab
     }
 
     
@@ -33,7 +32,7 @@ class MenuViewController: UITabBarController {
         
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = .white
+        appearance.backgroundColor = UIColor(hex: "#F3F3F3")
 
         let blackTextAttributes: [NSAttributedString.Key: Any] = [
             .font: UIFont(name: "Lato-Medium", size: 14.0)!,

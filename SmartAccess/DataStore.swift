@@ -9,12 +9,7 @@ import Foundation
 
 class DataStore {
     var userAuth: User?
-    var userInfo:[String: Any]?
-    var accountInfo:[String:Any]?
-    var configuration:[String: Any]!
-    var releaseNotes:[String:Any]?
-    var refreshHome = false
-    var timeZone = TimeZone.current.identifier
+    var userInfo:Userinfo?
     var accountId:String?
 
     static let shared = DataStore()
@@ -23,6 +18,6 @@ class DataStore {
     func clearData() {
         userAuth = nil
         userInfo = nil
-        configuration = [:]
+        accountId = nil
     }
 }

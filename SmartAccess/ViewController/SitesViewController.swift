@@ -40,7 +40,8 @@ class SitesViewController: UIViewController {
         guard let userName = DataStore.shared.userAuth?.results.username,
               let tokenStr = DataStore.shared.userAuth?.results.accessToken,
               let customerName = DataStore.shared.userAuth?.results.mappedCustomers[0].customerName,
-              let customerId =  DataStore.shared.userAuth?.results.mappedCustomers[0].pkCustomerId else {
+              let customerId =  DataStore.shared.userAuth?.results.mappedCustomers[0].pkCustomerId,
+              let fkTenantId =  DataStore.shared.userAuth?.results.mappedCustomers[0].fkTenantId else {
             return
         }
         SVProgressHUD.show()
@@ -48,7 +49,8 @@ class SitesViewController: UIViewController {
             userName: userName,
             token: tokenStr,
             customerId: customerId.description,
-            customerName: customerName
+            customerName: customerName,
+            tenantId: fkTenantId.description
         ) { result in
             SVProgressHUD.dismiss()
             switch result {
