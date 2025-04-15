@@ -36,15 +36,21 @@ class MenuViewController: UITabBarController {
 
         let blackTextAttributes: [NSAttributedString.Key: Any] = [
             .font: UIFont(name: "Lato-Medium", size: 14.0)!,
+            .foregroundColor: UIColor.gray
+        ]
+
+        let selectedTextAttributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont(name: "Lato-Bold", size: 16.0)!,
             .foregroundColor: UIColor.black
         ]
 
+
         // Set same black text for both states
-        appearance.stackedLayoutAppearance.selected.titleTextAttributes = blackTextAttributes
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = selectedTextAttributes
         appearance.stackedLayoutAppearance.normal.titleTextAttributes = blackTextAttributes
 
         // Set icon tint
-        appearance.stackedLayoutAppearance.selected.iconColor = UIColor(hex: "#1D7C1D")
+        appearance.stackedLayoutAppearance.selected.iconColor = UIColor.black
         appearance.stackedLayoutAppearance.normal.iconColor = UIColor.black
 
         tabBar.standardAppearance = appearance

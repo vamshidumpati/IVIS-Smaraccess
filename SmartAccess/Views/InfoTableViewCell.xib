@@ -47,6 +47,8 @@
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
+                <outlet property="imageViewWidth" destination="85E-Yx-GtY" id="VW7-sb-tJf"/>
+                <outlet property="leading" destination="ya4-bX-Xc6" id="5vO-KB-psq"/>
                 <outlet property="profileImage" destination="hsp-FR-Ldg" id="8MY-oW-Yqm"/>
                 <outlet property="profileName" destination="auS-mj-I4m" id="lcF-UY-s3h"/>
             </connections>

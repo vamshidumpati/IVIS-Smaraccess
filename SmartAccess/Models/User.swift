@@ -10,7 +10,7 @@ import Foundation
 struct User: Codable {
     let errorMessage: String
     let errorCode: String
-    var results: Results
+    var results: UserData
 
     enum CodingKeys: String, CodingKey {
         case errorMessage
@@ -19,7 +19,7 @@ struct User: Codable {
     }
 }
 
-struct Results: Codable {
+struct UserData: Codable {
     let accessToken: String
     let category: String
     let departmentName: String

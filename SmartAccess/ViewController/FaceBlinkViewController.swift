@@ -9,215 +9,149 @@ import UIKit
 import AVFoundation
 import Vision
 
-class FaceBlinkViewController: UIViewController {
+class FaceBlinkViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
+    @IBOutlet weak var captureView: UIView!
+    @IBOutlet weak var captureBtn: UIButton!
+    @IBOutlet weak var retakeBtn: UIButton!
+    @IBOutlet weak var doneBtn: UIButton!
+    @IBOutlet weak var capturedImageView: UIImageView!
+    @IBOutlet weak var statusLabel: UILabel!
+    @IBOutlet weak var faceBoundaryView: UIImageView!
     
-    // MARK: - Properties
-    private let captureSession = AVCaptureSession()
-    private let sessionQueue = DispatchQueue(label: "camera.session.queue")
-    private var previewLayer: AVCaptureVideoPreviewLayer!
-    private var faceGuideImageView: UIImageView!
-    
-    // Detection state
-    private var isFaceDetected = false
-    private var isBlinkDetected = false
-    private var lastEyeState: (left: Bool, right: Bool) = (false, false) // false = open
-    
-    var uploadProfileImage:Bool = false
-    
-    // UI Components
-    private let statusLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .white
-        label.font = UIFont.boldSystemFont(ofSize: 24)
-        label.textAlignment = .center
-        label.numberOfLines = 0
-        label.text = "Align your face with the guide"
-        return label
-    }()
-    
-    private let captureButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("📸 CAPTURE", for: .normal)
-        button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 20)
-        button.backgroundColor = UIColor.systemGreen.withAlphaComponent(0.8)
-        button.setTitleColor(.white, for: .normal)
-        button.layer.cornerRadius = 25
-        button.isHidden = true
-        return button
-    }()
-    
-    // MARK: - Lifecycle
+    var captureSession: AVCaptureSession!
+    var videoPreviewLayer: AVCaptureVideoPreviewLayer!
+
+    var isFaceDetected = false
+    var isBlinkDetected = false
+    private var lastEyeState: (left: Bool, right: Bool) = (false, false)
+    private var lastCapturedImage: UIImage?
+    private var currentSampleBuffer: CMSampleBuffer?
+
+
+
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.tabBarController?.tabBar.isHidden = true
+        self.navigationItem.hidesBackButton = true
         setupUI()
-        checkCameraPermission()
-        disableNavigation()
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        startCaptureSession()
+
+    func setupUI() {
+        self.captureBtn.layer.cornerRadius = self.captureBtn.frame.width / 2
+        self.captureBtn.isHidden = true
+        self.retakeBtn.isHidden = true
+        self.doneBtn.isHidden = true
+        self.capturedImageView.isHidden = true
     }
-    
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        setupCamera()
+    }
+
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        stopCaptureSession()
+        self.captureSession?.stopRunning()
     }
-    
-    // MARK: - Setup
-    private func disableNavigation() {
-        navigationController?.setNavigationBarHidden(true, animated: false)
-        navigationController?.interactivePopGestureRecognizer?.isEnabled = false
-    }
-    
-    private func setupUI() {
-        view.backgroundColor = .black
-        
-        // Face guide image
-        faceGuideImageView = UIImageView(image: UIImage(named: "face_authorization_image"))
-        faceGuideImageView.contentMode = .scaleAspectFit
-        faceGuideImageView.alpha = 0.7
-        view.addSubview(faceGuideImageView)
-        faceGuideImageView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            faceGuideImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            faceGuideImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            faceGuideImageView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
-            faceGuideImageView.heightAnchor.constraint(equalTo: faceGuideImageView.widthAnchor)
-        ])
-        
-        // Status label
-        view.addSubview(statusLabel)
-        statusLabel.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            statusLabel.topAnchor.constraint(equalTo: faceGuideImageView.bottomAnchor, constant: 30),
-            statusLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            statusLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
-        ])
-        
-        // Capture button
-        view.addSubview(captureButton)
-        captureButton.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            captureButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40),
-            captureButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            captureButton.widthAnchor.constraint(equalToConstant: 200),
-            captureButton.heightAnchor.constraint(equalToConstant: 50)
-        ])
-        
-        captureButton.addTarget(self, action: #selector(captureImage), for: .touchUpInside)
-    }
-    
-    private func startCaptureSession() {
-         sessionQueue.async {
-             if !self.captureSession.isRunning {
-                 self.captureSession.startRunning()
-             }
-         }
-     }
-     
-     private func stopCaptureSession() {
-         sessionQueue.async {
-             if self.captureSession.isRunning {
-                 self.captureSession.stopRunning()
-             }
-         }
-     }
-    
-    // MARK: - Camera Setup
-    private func checkCameraPermission() {
-        switch AVCaptureDevice.authorizationStatus(for: .video) {
-        case .authorized:
-            setupCamera()
-        case .notDetermined:
-            AVCaptureDevice.requestAccess(for: .video) { granted in
-                if granted {
-                    DispatchQueue.main.async {
-                        self.setupCamera()
-                    }
-                }
-            }
-        default:
-            //showCameraAccessAlert()
-            print("Camera not detected")
-        }
-    }
-    
-    private func setupCamera() {
-        sessionQueue.async {
-            guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front),
-                  let input = try? AVCaptureDeviceInput(device: device) else {
-                DispatchQueue.main.async {
-                    self.statusLabel.text = "Camera not available"
-                }
+
+    func setupCamera() {
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let self = self else { return }
+
+            self.captureSession = AVCaptureSession()
+            self.captureSession.sessionPreset = .medium
+
+            guard let frontCamera = AVCaptureDevice.default(.builtInWideAngleCamera,
+                                                            for: .video,
+                                                            position: .front) else {
+                print("Unable to access front camera!")
                 return
             }
-            
-            self.captureSession.beginConfiguration()
-            if self.captureSession.canAddInput(input) {
-                self.captureSession.addInput(input)
-            }
-            
-            let output = AVCaptureVideoDataOutput()
-            output.setSampleBufferDelegate(self, queue: DispatchQueue(label: "video.queue"))
-            
-            if self.captureSession.canAddOutput(output) {
-                self.captureSession.addOutput(output)
-            }
-            
-            self.captureSession.commitConfiguration()
-            
-            DispatchQueue.main.async {
-                self.previewLayer = AVCaptureVideoPreviewLayer(session: self.captureSession)
-                self.previewLayer.frame = self.view.layer.bounds
-                self.previewLayer.videoGravity = .resizeAspectFill
-                self.view.layer.insertSublayer(self.previewLayer, at: 0)
+
+            do {
+                let input = try AVCaptureDeviceInput(device: frontCamera)
+                if self.captureSession.canAddInput(input) {
+                    self.captureSession.addInput(input)
+                }
+
+                let videoOutput = AVCaptureVideoDataOutput()
+                videoOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "videoQueue"))
+                if self.captureSession.canAddOutput(videoOutput) {
+                    self.captureSession.addOutput(videoOutput)
+                }
+
+                self.captureSession.startRunning()
+
+                DispatchQueue.main.async {
+                    self.videoPreviewLayer = AVCaptureVideoPreviewLayer(session: self.captureSession)
+                    self.videoPreviewLayer.videoGravity = .resizeAspectFill
+                    self.videoPreviewLayer.connection?.videoOrientation = .portrait
+                    self.videoPreviewLayer.frame = self.captureView.bounds
+                    self.captureView.layer.insertSublayer(self.videoPreviewLayer, at: 0)
+                }
+
+            } catch {
+                print("Error setting up camera input: \(error)")
             }
         }
     }
-    
-    // MARK: - Blink Detection
-    private func processFace(_ face: VNFaceObservation) {
-        guard let landmarks = face.landmarks,
-              let leftEye = landmarks.leftEye,
-              let rightEye = landmarks.rightEye else {
-            // No face or no eyes detected
-            handleNoFaceDetected()
-            return
-        }
-        
-        if !uploadProfileImage{
-            // Face is detected
-            isFaceDetected = true
-            
-            // Check eye states
-            let leftEyeClosed = isEyeClosed(leftEye)
-            let rightEyeClosed = isEyeClosed(rightEye)
-            
-            // Detect blink (transition from open to closed)
-            if leftEyeClosed && rightEyeClosed && (!lastEyeState.left || !lastEyeState.right) {
-                handleBlinkDetected()
+
+
+    // MARK: - AVCaptureVideoDataOutputSampleBufferDelegate
+    func captureOutput(_ output: AVCaptureOutput,
+                       didOutput sampleBuffer: CMSampleBuffer,
+                       from connection: AVCaptureConnection) {
+
+        currentSampleBuffer = sampleBuffer // 👈 store latest buffer for capture
+
+        guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
+
+        detectFace(in: pixelBuffer)
+    }
+
+    // MARK: - Face & Blink Detection
+    private func detectFace(in pixelBuffer: CVPixelBuffer) {
+        let faceDetectionRequest = VNDetectFaceLandmarksRequest { [weak self] request, error in
+            guard let self = self else { return }
+
+            if let error = error {
+                print("Face detection error: \(error.localizedDescription)")
+                self.handleNoFaceDetected()
+                return
             }
-            
-            // Update last eye state
-            lastEyeState = (leftEyeClosed, rightEyeClosed)
+
+            guard let results = request.results as? [VNFaceObservation], let face = results.first else {
+                self.handleNoFaceDetected()
+                return
+            }
+
+            if !self.isFaceDetected {
+                self.handleFaceInitiallyDetected()
+            }
+
+            if self.isFaceDetected && !self.isBlinkDetected {
+                self.detectBlink(face: face)
+            }
         }
-        
-        updateUI()
+
+        let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer,
+                                            orientation: .leftMirrored,
+                                            options: [:])
+        try? handler.perform([faceDetectionRequest])
     }
-    
-    private func isEyeClosed(_ eye: VNFaceLandmarkRegion2D) -> Bool {
-        let points = eye.normalizedPoints
-        let eyeWidth = (points.map { $0.x }.max() ?? 0) - (points.map { $0.x }.min() ?? 0)
-        let eyeHeight = (points.map { $0.y }.max() ?? 0) - (points.map { $0.y }.min() ?? 0)
-        
-        // Calculate eye aspect ratio (more reliable than just height)
-        let ear = eyeHeight / eyeWidth
-        
-        // Threshold for closed eye (adjust as needed)
-        return ear < 0.25
+
+    private func handleFaceInitiallyDetected() {
+        isFaceDetected = true
+        DispatchQueue.main.async {
+            self.statusLabel.text = "Great! Now blink your eyes"
+            self.statusLabel.textColor = .systemYellow
+            self.statusLabel.layer.removeAllAnimations()
+            UIView.animate(withDuration: 0.5, delay: 0, options: [.repeat, .autoreverse], animations: {
+                self.statusLabel.transform = CGAffineTransform(scaleX: 1.05, y: 1.05)
+            }, completion: nil)
+        }
     }
-    
+
     private func handleNoFaceDetected() {
         isFaceDetected = false
         isBlinkDetected = false
@@ -225,80 +159,142 @@ class FaceBlinkViewController: UIViewController {
         DispatchQueue.main.async {
             self.statusLabel.text = "Align your face with the guide"
             self.statusLabel.textColor = .white
-            self.captureButton.isHidden = true
+            self.statusLabel.layer.removeAllAnimations()
+            self.statusLabel.transform = .identity
+            self.captureBtn.isHidden = true
         }
     }
-    
+
+    private func detectBlink(face: VNFaceObservation) {
+        guard let landmarks = face.landmarks,
+              let leftEye = landmarks.leftEye,
+              let rightEye = landmarks.rightEye else {
+            return
+        }
+
+        let leftEyeClosed = isEyeClosed(leftEye)
+        let rightEyeClosed = isEyeClosed(rightEye)
+
+        if leftEyeClosed && rightEyeClosed && (!lastEyeState.left || !lastEyeState.right) {
+            handleBlinkDetected()
+        }
+
+        lastEyeState = (leftEyeClosed, rightEyeClosed)
+    }
+
+    private func isEyeClosed(_ eye: VNFaceLandmarkRegion2D) -> Bool {
+        let points = eye.normalizedPoints
+        let eyeWidth = (points.map { $0.x }.max() ?? 0) - (points.map { $0.x }.min() ?? 0)
+        let eyeHeight = (points.map { $0.y }.max() ?? 0) - (points.map { $0.y }.min() ?? 0)
+        let ear = eyeHeight / eyeWidth
+        return ear < 0.25
+    }
+
     private func handleBlinkDetected() {
         isBlinkDetected = true
         DispatchQueue.main.async {
-            self.statusLabel.text = "Blink detected!"
+            self.statusLabel.text = "Perfect! Ready to capture"
             self.statusLabel.textColor = .systemGreen
-            self.captureButton.isHidden = false
-            
-//            // Auto-hide after 3 seconds if not captured
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-//                if !self.captureButton.isHidden {
-//                    self.isBlinkDetected = false
-//                    self.updateUI()
-//                }
-//            }
-        }
-    }
-    
-    private func updateUI() {
-        DispatchQueue.main.async {
-            if !self.isFaceDetected {
-                self.statusLabel.text = "Align your face with the guide"
-                self.statusLabel.textColor = .white
-                self.captureButton.isHidden = true
-            } else if !self.isBlinkDetected {
-                self.statusLabel.text = "Face detected - blink to capture"
-                self.statusLabel.textColor = .systemYellow
-                self.captureButton.isHidden = true
-            } else {
-                self.statusLabel.text = "Ready to capture!"
-                self.statusLabel.textColor = .systemGreen
-                self.captureButton.isHidden = false
+            self.statusLabel.layer.removeAllAnimations()
+            self.statusLabel.transform = .identity
+            self.captureBtn.isHidden = false
+
+            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5,
+                           initialSpringVelocity: 0.5, options: [], animations: {
+                self.captureBtn.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+            }) { _ in
+                UIView.animate(withDuration: 0.3) {
+                    self.captureBtn.transform = .identity
+                }
             }
         }
     }
     
-    @objc private func captureImage() {
-        print("Photo captured!")
-        // Add your capture logic here
-        isBlinkDetected = false
-        updateUI()
+    func imageFromSampleBuffer(_ sampleBuffer: CMSampleBuffer) -> UIImage? {
+        guard let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return nil }
+        let ciImage = CIImage(cvPixelBuffer: imageBuffer)
+        let context = CIContext()
+        guard let cgImage = context.createCGImage(ciImage, from: ciImage.extent) else { return nil }
+        return UIImage(cgImage: cgImage, scale: UIScreen.main.scale, orientation: .leftMirrored)
     }
+    
+    @IBAction func onRetakeTapped(_ sender: UIButton) {
+        captureBtn.isHidden = false
+        doneBtn.isHidden = true
+        retakeBtn.isHidden = true
+        capturedImageView.isHidden = true
+        self.view.sendSubviewToBack(retakeBtn)
+        self.view.sendSubviewToBack(doneBtn)
+        faceBoundaryView.isHidden = false
+        isBlinkDetected = false
+        lastEyeState = (false, false)
+        statusLabel.text = "Align your face with the guide"
+        statusLabel.textColor = .white
+        statusLabel.isHidden = false
+        // Restart the camera feed
+            if !captureSession.isRunning {
+                DispatchQueue.global(qos: .userInteractive).async{
+                    self.captureSession.startRunning()
+                }
+            }
+    }
+    
+    @IBAction func onCaptureTapped(_ sender: UIButton) {
+        guard let buffer = currentSampleBuffer,
+              let image = imageFromSampleBuffer(buffer) else { return }
+        faceBoundaryView.isHidden = true
+        lastCapturedImage = image
+        capturedImageView.image = image
+        capturedImageView.isHidden = false
+        //self.view.bringSubviewToFront(capturedImageView)
+        self.view.bringSubviewToFront(retakeBtn)
+        self.view.bringSubviewToFront(doneBtn)
+        captureBtn.isHidden = true
+        doneBtn.isHidden = false
+        retakeBtn.isHidden = false
+        statusLabel.isHidden = true
+        captureSession.stopRunning()
+    }
+    
+    @IBAction func validateFaceAction(_ sender: Any) {
+        if let image = lastCapturedImage,
+           let imageData = image.compress(toMaxSizeKB: 450) {
+
+            // Save image to temporary directory
+            let tempDirectory = FileManager.default.temporaryDirectory
+            let fileName = "compressed_photo.jpg"
+            let fileURL = tempDirectory.appendingPathComponent(fileName)
+            
+            do {
+                try imageData.write(to: fileURL)
+
+                // Prepare parameters for multipart form
+                let parameters: [[String: Any]] = [
+                    [
+                        "key": "photo",
+                        "src": fileURL.path,
+                        "type": "file"
+                    ],
+                    [
+                        "key": "empId",
+                        "value": DataStore.shared.userAuth?.results.employeeId ?? "",
+                        "type": "text"
+                    ]
+                ]
+                let route = "\(Environment.baseURL)" + "/api/smartaccess/frsvalidation/validateFace"
+                NetworkManager.uploadFaceValidationData(parameters: parameters, urlString: route) {result in
+                    switch result {
+                        case .success(let json):
+                            print("✅ JSON Response: \(json)")
+                        case .failure(let error):
+                            print("❌ Error: \(error.localizedDescription)")
+                        }
+                }
+            } catch {
+                print("Error writing image to disk: \(error)")
+            }
+        }
+    }
+    
 }
 
-// MARK: - Video Data Output Delegate
-extension FaceBlinkViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
-    func captureOutput(_ output: AVCaptureOutput,
-                      didOutput sampleBuffer: CMSampleBuffer,
-                      from connection: AVCaptureConnection) {
-        
-        guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
-        
-        let request = VNDetectFaceLandmarksRequest { [weak self] request, error in
-            guard let self = self else { return }
-            
-            if let error = error {
-                print("Face detection error: \(error.localizedDescription)")
-                self.handleNoFaceDetected()
-                return
-            }
-            
-            guard let results = request.results as? [VNFaceObservation],
-                  let face = results.first else {
-                self.handleNoFaceDetected()
-                return
-            }
-            
-            self.processFace(face)
-        }
-        
-        let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, orientation: .leftMirrored)
-        try? handler.perform([request])
-    }
-}

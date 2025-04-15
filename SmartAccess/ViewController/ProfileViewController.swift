@@ -12,9 +12,11 @@ class ProfileViewController: UIViewController {
     @IBOutlet weak var dataTableView: UITableView!
     @IBOutlet weak var nextBtn: UIButton!
     
-    var selectedSite:Site!
+    var selectedSite:Site?
     let loggedUserName =  DataStore.shared.userAuth?.results.fullName ?? "User"
     var selectedSegmentStr = ""
+    var deviceInfo:[String:Any] = [:]
+    var deviceStatus = ""
     
     var imagesArray = ["user_logo","building.fill"]
     
@@ -30,6 +32,42 @@ class ProfileViewController: UIViewController {
         navigationItem.hidesBackButton = true
     }
     
+    func loadInitialData() {
+        let siteId = selectedSite?.siteId ?? 0
+        let unitId = selectedSite?.unitId ?? 0
+        // First API call - Get Vault Configuration
+        NetworkManager.getVaultConfiguration(siteId: siteId, unitId: unitId) { result, error in
+            if error == "" {
+                // Success - proceed with second API call
+                guard let deviceId = DataStore.shared.vaultData?.ivisVault?.unit?.ivisunitId else {
+                    print("Error: Could not get device ID from vault data")
+                    return
+                }
+                
+                print("Vault config success. Device ID: \(deviceId)")
+                
+                // Second API call - Get Device Status
+                let params: [String: Any] = [
+                    "empId": DataStore.shared.userAuth?.results.employeeId ?? 0,
+                    "deviceId": deviceId
+                ]
+                
+                NetworkManager.getDeviceStatus(params: params) { data, error in
+                    if error == ""{
+                        self.deviceInfo = data
+                        print(self.deviceInfo)
+                        self.deviceStatus = self.deviceInfo["status"] as? String ?? ""
+                        DispatchQueue.main.async {
+                            self.dataTableView.reloadData()
+                        }
+                    }
+                }
+            } else {
+                print("Vault config error: \(error)")
+            }
+        }
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
@@ -37,6 +75,7 @@ class ProfileViewController: UIViewController {
     }
     
     func setupI(){
+        loadInitialData()
         nextBtn.titleLabel?.font = UIFont(name: "Lato-Bold", size: 14.0)
         nextBtn.layer.cornerRadius = 5
     }
@@ -56,17 +95,41 @@ class ProfileViewController: UIViewController {
     @IBAction func onTapNext(_ sender: Any) {
         if selectedSegmentStr == ""{
             self.displayAlert(title: "Error", message: "Please select one option from above list of options for requesting acess")
-        } else {
-            showConfirmationAlert(on: self, title: "Confirmation", message: "You've requested access with the \(selectedSegmentStr). Are you ready to proceed?") { isTappedYesOrNo in
-                if isTappedYesOrNo{
-                    let storyboard = UIStoryboard(name: "Main", bundle: nil)
-                    let detailsVC = storyboard.instantiateViewController(withIdentifier: "UserDetailsViewController") as? UserDetailsViewController
-                    detailsVC?.modalPresentationStyle = .fullScreen
-                    detailsVC?.modalTransitionStyle = .crossDissolve
-                    self.navigationController?.pushViewController(detailsVC!, animated: true)
-                } else {
-                    self.dismiss(animated: true)
+        } else if DataStore.shared.vaultData?.ivisVault?.unit?.ivisunitId ?? "" == ""{
+            self.displayAlert(title: "Error", message: "User not configured to this site")
+        }else {
+            getDeviceStatus { status in
+//                if status != "" && status != "ok"{
+//                    let message = status == "failed" ? "User not configured to this site" : status
+//                    self.displayAlert(title: "Error", message: message)
+//                    return
+//                } else {
+//
+//                }
+                self.showConfirmationAlert(on: self, title: "Confirmation", message: "You've requested access with the \(self.selectedSegmentStr). Are you ready to proceed?") { isTappedYesOrNo in
+                    if isTappedYesOrNo{
+                        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                        let detailsVC = storyboard.instantiateViewController(withIdentifier: "UserDetailsViewController") as? UserDetailsViewController
+                        detailsVC?.deviceStatus = self.deviceStatus
+                        detailsVC?.modalPresentationStyle = .fullScreen
+                        detailsVC?.modalTransitionStyle = .crossDissolve
+                        self.navigationController?.pushViewController(detailsVC!, animated: true)
+                    } else {
+                        self.dismiss(animated: true)
+                    }
                 }
+            }
+        }
+    }
+    
+    func getDeviceStatus(completion: @escaping (String) -> Void) {
+        // Retrieve deviceId; if empty, notify immediately.
+        let deviceId = DataStore.shared.vaultData?.ivisVault?.unit?.ivisunitId ?? ""
+        NetworkManager.getDoorStatus(deviceId: deviceId) { doorData, error in
+            if !error.isEmpty {
+                completion("User not configured to this site")
+            } else {
+                completion(doorData["data"] as? String ?? "")
             }
         }
     }
@@ -87,10 +150,11 @@ extension ProfileViewController:UITableViewDelegate,UITableViewDataSource{
             let infoCell = tableView.dequeueReusableCell(withIdentifier: "InfoTableViewCell") as? InfoTableViewCell
             infoCell?.profileImage?.tag = indexPath.row
             infoCell?.selectionStyle = .none
+            infoCell?.leading.constant = 5
             if indexPath.row == 0{
-                infoCell?.configure(name: loggedUserName, imageStr: imagesArray[indexPath.row])
+                infoCell?.configure(name: loggedUserName, imageStr: imagesArray[indexPath.row], deviceStatus: deviceStatus)
             } else if indexPath.row == 1 && selectedSite != nil{
-                infoCell?.configure(name: selectedSite.siteName, imageStr: imagesArray[indexPath.row])
+                infoCell?.configure(name: selectedSite!.siteName, imageStr: imagesArray[indexPath.row], deviceStatus: "")
             }
             cell = infoCell!
         } else if indexPath.section == 1{

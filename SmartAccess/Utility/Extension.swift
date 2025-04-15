@@ -123,6 +123,14 @@ extension UIView {
     }
 }
 
+extension UINavigationController {
+    func popToViewController<T: UIViewController>(ofClass: T.Type, animated: Bool = true) {
+        if let vc = viewControllers.first(where: { $0 is T }) {
+            popToViewController(vc, animated: animated)
+        }
+    }
+}
+
 extension UIColor {
     convenience init(hex: String) {
         var hexFormatted = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
@@ -139,6 +147,26 @@ extension UIColor {
         let blue = CGFloat(rgbValue & 0x0000FF) / 255.0
 
         self.init(red: red, green: green, blue: blue, alpha: 1.0)
+    }
+}
+
+extension UIImage {
+    func compress(toMaxSizeKB maxSizeKB: Int = 450) -> Data? {
+        let maxBytes = maxSizeKB * 1024
+        var compression: CGFloat = 1.0
+        let minCompression: CGFloat = 0.05
+        guard var imageData = self.jpegData(compressionQuality: compression) else { return nil }
+
+        while imageData.count > maxBytes && compression > minCompression {
+            compression -= 0.05
+            if let data = self.jpegData(compressionQuality: compression) {
+                imageData = data
+            } else {
+                break
+            }
+        }
+
+        return imageData.count <= maxBytes ? imageData : nil
     }
 }
 

@@ -10,7 +10,9 @@ import Foundation
 class DataStore {
     var userAuth: User?
     var userInfo:Userinfo?
+    var vaultData:VaultResults?
     var accountId:String?
+    var siteData:SiteResults?
 
     static let shared = DataStore()
     private init() { } // prevent creating another instances.
@@ -19,5 +21,7 @@ class DataStore {
         userAuth = nil
         userInfo = nil
         accountId = nil
+        //vaultData = nil
+        siteData = nil
     }
 }

@@ -1,5 +1,5 @@
 {
-  "originHash" : "d8309318748e4b7c119e4e7614382de719ddf9101f05c9b584a7a7e81fc57034",
+  "originHash" : "830879d8a0c74ec0e4c3a676374f63cc3967359f3e5a5550c07d5bdff36009fb",
   "pins" : [
     {
       "identity" : "iqkeyboardcore",
@@ -71,6 +71,15 @@
       "state" : {
         "revision" : "76f514eba5218bdf67659168ba227c77da5f75fe",
         "version" : "1.0.5"
+      }
+    },
+    {
+      "identity" : "panmodal",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/slackhq/PanModal",
+      "state" : {
+        "revision" : "b012aecb6b67a8e46369227f893c12544846613f",
+        "version" : "1.2.7"
       }
     },
     {

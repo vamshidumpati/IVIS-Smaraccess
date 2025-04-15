@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8835290B2DAD10B5006CB9BC /* PanModal in Frameworks */ = {isa = PBXBuildFile; productRef = 8835290A2DAD10B5006CB9BC /* PanModal */; };
 		887511512DA6734A00450B37 /* IQKeyboardManagerSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 887511502DA6734A00450B37 /* IQKeyboardManagerSwift */; };
 		887511542DA6739700450B37 /* SVProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 887511532DA6739700450B37 /* SVProgressHUD */; };
 		978767BCDF9B0CF42EBBEFBD /* Pods_SmartAccess.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 439954D9602FAF95A24C19C7 /* Pods_SmartAccess.framework */; };
@@ -61,6 +62,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8835290B2DAD10B5006CB9BC /* PanModal in Frameworks */,
 				887511542DA6739700450B37 /* SVProgressHUD in Frameworks */,
 				978767BCDF9B0CF42EBBEFBD /* Pods_SmartAccess.framework in Frameworks */,
 				887511512DA6734A00450B37 /* IQKeyboardManagerSwift in Frameworks */,
@@ -192,6 +194,7 @@
 			packageReferences = (
 				88813E952DA587FE0032EF37 /* XCRemoteSwiftPackageReference "IQKeyboardManager" */,
 				887511522DA6739700450B37 /* XCRemoteSwiftPackageReference "SVProgressHUD" */,
+				883529092DAD10B5006CB9BC /* XCRemoteSwiftPackageReference "PanModal" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 88D9A83D2D9CFBF2005485A6 /* Products */;
@@ -526,6 +529,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		883529092DAD10B5006CB9BC /* XCRemoteSwiftPackageReference "PanModal" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/slackhq/PanModal";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.7;
+			};
+		};
 		887511522DA6739700450B37 /* XCRemoteSwiftPackageReference "SVProgressHUD" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SVProgressHUD/SVProgressHUD";
@@ -545,6 +556,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		8835290A2DAD10B5006CB9BC /* PanModal */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 883529092DAD10B5006CB9BC /* XCRemoteSwiftPackageReference "PanModal" */;
+			productName = PanModal;
+		};
 		887511502DA6734A00450B37 /* IQKeyboardManagerSwift */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 88813E952DA587FE0032EF37 /* XCRemoteSwiftPackageReference "IQKeyboardManager" */;

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct UserProfile : Codable {
+struct UserReponse : Codable {
     let results : Userinfo?
     let errorMessage : String?
     let errorCode : String?

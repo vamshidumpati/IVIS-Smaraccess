@@ -14,62 +14,82 @@ class NetworkManager: NSObject {
     static let apiAppToken = Environment.apiAppToken
     static let refreshToken = Environment.refreshToken
     
-    static func call(payLoadFlag : Bool = false,route:String, requestType: String, requestBody:[String:Any]?, includeAuthHeaders:Bool = true,requestValues:[String:Any]? = nil, completionBlock: @escaping (_ error: String?, _ result: Any?) -> Void) -> Void {
+    static func call(payLoadFlag: Bool = false, route: String, requestType: String, requestBody: [String: Any]?,
+                    MultipartRequest: Bool? = false, includeAuthHeaders: Bool = true, completionBlock: @escaping (_ error: String?, _ result: Any?) -> Void) -> Void {
+        
         var baseUrl = Environment.baseURL.absoluteString
         
         guard let endpointUrl = URL(string: baseUrl + route) else {
+            completionBlock("Invalid URL", nil)
             return
         }
+        
         var request = URLRequest(url: endpointUrl)
         request.timeoutInterval = 200
         request.httpMethod = requestType
         
-        if let requestValues = requestValues {
-            for (key, value) in requestValues {
-                request.addValue("\(value)", forHTTPHeaderField: key)
-            }
-        }
-        let customerName = DataStore.shared.userAuth?.results.mappedCustomers[0].customerName
+        // Set common headers
         let customerID = DataStore.shared.userAuth?.results.mappedCustomers[0].pkCustomerId
         let fkTenantId = DataStore.shared.userAuth?.results.mappedCustomers[0].fkTenantId
-        let siteID = DataStore.shared.userAuth?.results.mappedGroups[0].siteId
-        let siteGroupID = DataStore.shared.userAuth?.results.mappedGroups[0].siteGroupId
-        let loginID = DataStore.shared.userAuth?.results.username
-        let accessToken = DataStore.shared.userAuth?.results.accessToken ?? ""
-       // request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        //request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         request.setValue(fkTenantId?.description ?? "null", forHTTPHeaderField: "Tenant-Id")
-        request.setValue(siteGroupID?.description ?? "null", forHTTPHeaderField: "Sitegroup-Id")
         request.setValue(customerID?.description ?? "null", forHTTPHeaderField: "Customer-Id")
-        request.setValue(loginID?.description ?? "null", forHTTPHeaderField: "Login-Id")
-        request.setValue(siteID?.description ?? "null", forHTTPHeaderField: "Site-Id")
-        //let boundary = generateBoundaryString()
-        //let formData = self.getMultiPartFormData(params: requestBody ?? [:], boundary: boundary)
-        if payLoadFlag{
-            if let jsonData = try? JSONSerialization.data(withJSONObject: requestBody as Any, options: .prettyPrinted) {
-                request.httpBody = jsonData
-                let length = "\(jsonData.count)"
-                request.addValue(length, forHTTPHeaderField: "Content-Length")
-                request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                request.addValue(DataStore.shared.accountId ?? "", forHTTPHeaderField: "Customer-Name")
-            }
-        }else{
-            if requestType == "POST" || requestType == "PUT" {
-                let jsonData = try? JSONSerialization.data(withJSONObject: requestBody ?? [:])
-                request.httpBody = jsonData
-                request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                request.addValue(DataStore.shared.accountId ?? "", forHTTPHeaderField: "Customer-Name")
-            }
-        }
         
-        if(includeAuthHeaders){
-            //Adding Authorization Token
-            if let userAuth = DataStore.shared.userAuth {
-                if route != "/auth/refresh"{
-                    request.addValue("Bearer \(userAuth.results.accessToken)", forHTTPHeaderField: "Authorization")
+        if MultipartRequest == false {
+            // Original JSON request handling
+            let customerName = DataStore.shared.userAuth?.results.mappedCustomers[0].customerName
+            let siteID = DataStore.shared.userAuth?.results.mappedGroups[0].siteId
+            let siteGroupID = DataStore.shared.userAuth?.results.mappedGroups[0].siteGroupId
+            let loginID = DataStore.shared.userAuth?.results.username
+            let accessToken = DataStore.shared.userAuth?.results.accessToken ?? ""
+            
+            request.setValue(siteGroupID?.description ?? "null", forHTTPHeaderField: "Sitegroup-Id")
+            request.setValue(loginID?.description ?? "null", forHTTPHeaderField: "Login-Id")
+            request.setValue(siteID?.description ?? "null", forHTTPHeaderField: "Site-Id")
+            request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            print("accessToken",accessToken)
+
+            if payLoadFlag {
+                if let jsonData = try? JSONSerialization.data(withJSONObject: requestBody as Any, options: .prettyPrinted) {
+                    request.httpBody = jsonData
+                    let length = "\(jsonData.count)"
+                    request.addValue(length, forHTTPHeaderField: "Content-Length")
+                    request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                    request.addValue(DataStore.shared.accountId ?? "", forHTTPHeaderField: "Customer-Name")
+                }
+            } else {
+                if requestType == "POST" || requestType == "PUT" {
+                    let jsonData = try? JSONSerialization.data(withJSONObject: requestBody ?? [:])
+                    request.httpBody = jsonData
+                    request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                    request.addValue(DataStore.shared.accountId ?? "", forHTTPHeaderField: "Customer-Name")
                 }
             }
+        } else {
+            // Multipart Form Data Handling
+            let boundary = "Boundary-\(UUID().uuidString)"
+            var body = Data()
+            
+            // Add authorization headers if needed
+            if includeAuthHeaders {
+                let accessToken = DataStore.shared.userAuth?.results.accessToken ?? ""
+                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
+            
+            // Process each parameter in the request body
+            requestBody?.forEach { key, value in
+                body.append("--\(boundary)\r\n".data(using: .utf8)!)
+                body.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
+                body.append("\(value)\r\n".data(using: .utf8)!)
+            }
+            
+            // Close the multipart form data
+            body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+            
+            request.httpBody = body
+            request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+            request.setValue("\(body.count)", forHTTPHeaderField: "Content-Length")
         }
+        
         let task = URLSession.shared.dataTask(with: request) { (data, urlResponse, error) in
             DispatchQueue.main.async {
                 if let error = error {
@@ -78,12 +98,14 @@ class NetworkManager: NSObject {
                 }
                 
                 guard let httpResponse = urlResponse as? HTTPURLResponse else {
+                    completionBlock("Invalid response", nil)
                     return
                 }
                 
-                if(httpResponse.statusCode == 200){
+                switch httpResponse.statusCode {
+                case 200:
                     completionBlock(nil, data)
-                } else if (httpResponse.statusCode == 401 && includeAuthHeaders) {
+                case 401 where includeAuthHeaders:
                     if let data = data {
                         do {
                             let res = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any]
@@ -95,8 +117,10 @@ class NetworkManager: NSObject {
                     } else {
                         completionBlock("Unknown Error", nil)
                     }
-                    NetworkManager.refreshToken(route: route, requestType: requestType, requestBody: requestBody, includeAuthHeaders: includeAuthHeaders, completionBlock: completionBlock)
-                } else {
+                    NetworkManager.refreshToken(route: route, requestType: requestType,
+                                              requestBody: requestBody, includeAuthHeaders: includeAuthHeaders,
+                                              completionBlock: completionBlock)
+                default:
                     if let data = data {
                         do {
                             let res = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any]
@@ -112,7 +136,6 @@ class NetworkManager: NSObject {
             }
         }
         task.resume()
-        
     }
     
     static func getMultiPartFormData(params:[String:Any], boundary:String) -> String {
@@ -379,13 +402,165 @@ class NetworkManager: NSObject {
             }
             
             do {
-                let decoded = try JSONDecoder().decode(UserProfile.self, from: result as! Data)
+                let decoded = try JSONDecoder().decode(UserReponse.self, from: result as! Data)
                 DataStore.shared.userInfo = decoded.results
                 completion("")
             } catch {
                 completion(error.localizedDescription)
             }
         }
+    }
+    
+    static func getVaultConfiguration(siteId: Int, unitId: Int, completion: @escaping(_ result: String?, _ error: String?) -> Void) {
+        let route = "/api/vaults/vaultaccessflow?siteId=\(siteId)&unitId=\(unitId)"
+        self.call(route: route, requestType: "GET", requestBody: [:]) { error, result in
+            if let error = error {
+                completion(nil, error.description)
+                return
+            }
+            
+            guard let data = result as? Data else {
+                completion(nil, "Invalid response data")
+                return
+            }
+            
+            do {
+                let decoder = JSONDecoder()
+                let response = try decoder.decode(VaultResponse.self, from: data)
+                DataStore.shared.vaultData = response.results
+                completion("Success", "")
+            } catch {
+                print("Decoding error: \(error)")
+            }
+        }
+    }
+    
+    static func getDeviceStatus(params:[String:Any],completion:@escaping (_ data:[String:Any], _ error:String) -> Void){
+        let route = "/api/smartaccess/frsvalidation/accessflow"
+        self.call(payLoadFlag:false,route: route, requestType: "POST",requestBody: params, MultipartRequest:true) { error, result in
+            if let error = error{
+                completion([:], error)
+            }
+            // Ensure we have valid Data in result
+            guard let data = result as? Data else {
+                completion([:], "No valid data received")
+                return
+            }
+            do {
+                // Convert the bytes data into a JSON dictionary
+                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                    completion(json,"")
+                } else {
+                    completion([:], "Unexpected JSON format")
+                }
+            } catch {
+                completion([:], "Failed to parse JSON: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    static func getDoorStatus(deviceId: String, completion: @escaping (_ data:[String:Any], _ error: String) -> Void) {
+        // Append the deviceId to the route URL
+        let route = "/api/smartaccess/frsvalidation/doorstatus?deviceId=\(deviceId)"
+        
+        self.call(route: route, requestType: "GET", requestBody: [:], includeAuthHeaders: false) { error, result in
+            // Return if an error occurs
+            if let error = error {
+                completion([:], error)
+                return
+            }
+            
+            // Ensure we have valid Data in result
+            guard let data = result as? Data else {
+                completion([:], "No valid data received")
+                return
+            }
+            
+            do {
+                // Convert the bytes data into a JSON dictionary
+                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                    completion(json, "")
+                } else {
+                    completion([:], "Unexpected JSON format")
+                }
+            } catch {
+                completion([:], "Failed to parse JSON: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    static func uploadFaceValidationData(parameters: [[String: Any]],fileParamKey: String = "photo",urlString: String,completion: @escaping (Result<[String: Any], Error>) -> Void) {
+        let boundary = "Boundary-\(UUID().uuidString)"
+        var body = Data()
+        
+        for param in parameters {
+            if param["disabled"] != nil { continue }
+            guard let paramName = param["key"] as? String else { continue }
+            
+            body.append("--\(boundary)\r\n".data(using: .utf8)!)
+            body.append("Content-Disposition: form-data; name=\"\(paramName)\"".data(using: .utf8)!)
+            
+            if let contentType = param["contentType"] as? String {
+                body.append("\r\nContent-Type: \(contentType)".data(using: .utf8)!)
+            }
+            
+            if let paramType = param["type"] as? String, paramType == "text", let value = param["value"] as? String {
+                body.append("\r\n\r\n\(value)\r\n".data(using: .utf8)!)
+            } else if let paramType = param["type"] as? String, paramType == "file", let filePath = param["src"] as? String {
+                let fileURL = URL(fileURLWithPath: filePath)
+                let fileName = fileURL.lastPathComponent
+                let mimeType = "image/jpeg" // Adjust if needed
+                
+                if let fileData = try? Data(contentsOf: fileURL) {
+                    body.append("; filename=\"\(fileName)\"\r\n".data(using: .utf8)!)
+                    body.append("Content-Type: \(mimeType)\r\n\r\n".data(using: .utf8)!)
+                    body.append(fileData)
+                    body.append("\r\n".data(using: .utf8)!)
+                } else {
+                    print("⚠️ Could not read file at path: \(filePath)")
+                }
+            }
+        }
+        
+        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+        
+        guard let url = URL(string: urlString) else {
+            completion(.failure(NSError(domain: "InvalidURL", code: 0, userInfo: nil)))
+            return
+        }
+        let customerID = DataStore.shared.userAuth?.results.mappedCustomers[0].pkCustomerId
+        let fkTenantId = DataStore.shared.userAuth?.results.mappedCustomers[0].fkTenantId
+        let accessToken = DataStore.shared.userAuth?.results.accessToken ?? ""
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        request.setValue(customerID?.description ?? "null", forHTTPHeaderField: "Customer-id")
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization") // Replace with real token
+        request.httpBody = body
+        
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
+            guard let data = data else {
+                completion(.failure(NSError(domain: "NoData", code: 0, userInfo: nil)))
+                return
+            }
+            
+            do {
+                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                    completion(.success(json))
+                } else {
+                    completion(.failure(NSError(domain: "InvalidResponseFormat", code: 0, userInfo: nil)))
+                }
+            } catch {
+                completion(.failure(error))
+            }
+        }
+        task.resume()
     }
 }
 

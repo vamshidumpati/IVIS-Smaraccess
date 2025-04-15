@@ -47,20 +47,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window.makeKeyAndVisible()
     }
     
-//    func loadUserDataFromUserDefaults() -> Results? {
-//        if let savedData = UserDefaults.standard.data(forKey: "UserAuthData") {
-//            let decoder = JSONDecoder()
-//            if let loadedUser = try? decoder.decode(Results.self, from: savedData) {
-//                DataStore.shared.userAuth = nil
-//                if let loadedUser = try? decoder.decode(User.self, from: savedData) {
-//                    DataStore.shared.userAuth = loadedUser
-//                }
-//                return loadedUser
-//            }
-//        }
-//        return nil
-//    }
-    
     func loadUserDataFromUserDefaults() {
         if let savedData = UserDefaults.standard.data(forKey: "UserAuthData") {
             let decoder = JSONDecoder()

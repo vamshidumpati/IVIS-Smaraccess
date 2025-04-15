@@ -12,6 +12,7 @@ class SitesViewController: UIViewController {
     @IBOutlet weak var logoView: UIView!
     @IBOutlet weak var sitesTableView: UITableView!
     @IBOutlet weak var siteSearchBar: UISearchBar!
+    @IBOutlet weak var logoutBtn: UIButton!
     
     var siteListResponse: SiteResponseModel!
     var sitesData: [Site] = []
@@ -24,6 +25,7 @@ class SitesViewController: UIViewController {
         siteSearchBar.delegate = self
         sitesTableView.estimatedRowHeight = 40
         sitesTableView.rowHeight = UITableView.automaticDimension
+        self.view.bringSubviewToFront(logoutBtn)
         bindSiteList()
     }
     
@@ -52,7 +54,6 @@ class SitesViewController: UIViewController {
             customerName: customerName,
             tenantId: fkTenantId.description
         ) { result in
-            SVProgressHUD.dismiss()
             switch result {
             case .success(let response):
                 self.siteListResponse = response
@@ -68,12 +69,16 @@ class SitesViewController: UIViewController {
                 alert.addAction(UIAlertAction(title: "OK", style: .default))
                 self.present(alert, animated: true)
             }
-            DispatchQueue.main.async{
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2){
+                SVProgressHUD.dismiss()
                 self.sitesTableView.reloadData()
             }
         }
     }
-
+    @IBAction func onTapLogoutAction(_ sender: Any) {
+        let accountVC = AccountViewController() // Recreate if needed
+        navigationController?.setViewControllers([accountVC], animated: true)
+    }
 }
 
 extension SitesViewController: UITableViewDelegate, UITableViewDataSource {
@@ -87,7 +92,9 @@ extension SitesViewController: UITableViewDelegate, UITableViewDataSource {
             fatalError("SiteCell not registered or incorrect class")
         }
         cell.siteName.font = UIFont(name: "Lato-medium", size: 14.0)
-        cell.siteName.text = filterdData[indexPath.row].siteName
+        if !filterdData.isEmpty{
+            cell.siteName.text = filterdData[indexPath.row].siteName
+        }
         return cell
     }
     
