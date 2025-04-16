@@ -262,12 +262,29 @@ class FaceBlinkViewController: UIViewController, AVCaptureVideoDataOutputSampleB
         guard let capturedImage = capturedImageView.image else { return }
         NetworkManager.validateFace(image: capturedImage, completion: { result in
             switch result {
-            case .success(let json):
-                print("✅ Face validated: \(json)")
+            case .success(_):
+                self.fetchChecklistQuestions()
             case .failure(let error):
                 print("❌ Validation failed: \(error.localizedDescription)")
             }
         })
+    }
+    
+    func fetchChecklistQuestions(){
+        NetworkManager.getChecklistQuestions { data, error in
+            if error == ""{
+                self.navigateToQuestionsVC(questionsData: data ?? [])
+            } else {
+                self.displayAlert(title: "Error", message: "Failed to fetch checklist questions")
+            }
+        }
+    }
+    
+    func navigateToQuestionsVC(questionsData:[Question]){
+        let storyBoard = UIStoryboard(name: "Main", bundle: nil)
+        let questionsVC = storyBoard.instantiateViewController(withIdentifier: "QuestionsViewController") as? QuestionsViewController
+        questionsVC?.questions = questionsData
+        self.navigationController?.pushViewController(questionsVC!, animated: true)
     }
 }
 

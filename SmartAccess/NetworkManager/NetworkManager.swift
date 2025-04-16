@@ -17,7 +17,7 @@ class NetworkManager: NSObject {
     static func call(payLoadFlag: Bool = false, route: String, requestType: String, requestBody: [String: Any]?,
                     MultipartRequest: Bool? = false, includeAuthHeaders: Bool = true, completionBlock: @escaping (_ error: String?, _ result: Any?) -> Void) -> Void {
         
-        var baseUrl = Environment.baseURL.absoluteString
+        let baseUrl = Environment.baseURL.absoluteString
         
         guard let endpointUrl = URL(string: baseUrl + route) else {
             completionBlock("Invalid URL", nil)
@@ -36,7 +36,6 @@ class NetworkManager: NSObject {
         
         if MultipartRequest == false {
             // Original JSON request handling
-            let customerName = DataStore.shared.userAuth?.results.mappedCustomers[0].customerName
             let siteID = DataStore.shared.userAuth?.results.mappedGroups[0].siteId
             let siteGroupID = DataStore.shared.userAuth?.results.mappedGroups[0].siteGroupId
             let loginID = DataStore.shared.userAuth?.results.username
@@ -489,81 +488,6 @@ class NetworkManager: NSObject {
         }
     }
     
-    static func uploadFaceValidationData(parameters: [[String: Any]],fileParamKey: String = "photo",urlString: String,completion: @escaping (Result<[String: Any], Error>) -> Void) {
-        let boundary = "Boundary-\(UUID().uuidString)"
-        var body = Data()
-        
-        for param in parameters {
-            if param["disabled"] != nil { continue }
-            guard let paramName = param["key"] as? String else { continue }
-            
-            body.append("--\(boundary)\r\n".data(using: .utf8)!)
-            body.append("Content-Disposition: form-data; name=\"\(paramName)\"".data(using: .utf8)!)
-            
-            if let contentType = param["contentType"] as? String {
-                body.append("\r\nContent-Type: \(contentType)".data(using: .utf8)!)
-            }
-            
-            if let paramType = param["type"] as? String, paramType == "text", let value = param["value"] as? String {
-                body.append("\r\n\r\n\(value)\r\n".data(using: .utf8)!)
-            } else if let paramType = param["type"] as? String, paramType == "file", let filePath = param["src"] as? String {
-                let fileURL = URL(fileURLWithPath: filePath)
-                let fileName = fileURL.lastPathComponent
-                let mimeType = "image/jpeg" // Adjust if needed
-                
-                if let fileData = try? Data(contentsOf: fileURL) {
-                    body.append("; filename=\"\(fileName)\"\r\n".data(using: .utf8)!)
-                    body.append("Content-Type: \(mimeType)\r\n\r\n".data(using: .utf8)!)
-                    body.append(fileData)
-                    body.append("\r\n".data(using: .utf8)!)
-                } else {
-                    print("⚠️ Could not read file at path: \(filePath)")
-                }
-            }
-        }
-        
-        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
-        
-        guard let url = URL(string: urlString) else {
-            completion(.failure(NSError(domain: "InvalidURL", code: 0, userInfo: nil)))
-            return
-        }
-        let customerID = DataStore.shared.userAuth?.results.mappedCustomers[0].pkCustomerId
-        let fkTenantId = DataStore.shared.userAuth?.results.mappedCustomers[0].fkTenantId
-        let accessToken = DataStore.shared.userAuth?.results.accessToken ?? ""
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-        request.setValue(customerID?.description ?? "null", forHTTPHeaderField: "Customer-id")
-        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization") // Replace with real token
-        request.httpBody = body
-        
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                completion(.failure(error))
-                return
-            }
-            
-            guard let data = data else {
-                completion(.failure(NSError(domain: "NoData", code: 0, userInfo: nil)))
-                return
-            }
-            
-            do {
-                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-                    completion(.success(json))
-                } else {
-                    completion(.failure(NSError(domain: "InvalidResponseFormat", code: 0, userInfo: nil)))
-                }
-            } catch {
-                completion(.failure(error))
-            }
-        }
-        task.resume()
-    }
-    
-    
     static func validateFace(image: UIImage,completion: @escaping (Result<[String: Any], Error>) -> Void) {
         let tokenId = DataStore.shared.userAuth?.results.accessToken ?? ""
         let empId = DataStore.shared.userInfo?.employeeId ?? ""
@@ -595,7 +519,7 @@ class NetworkManager: NSObject {
         // Add other fields
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"empId\"\r\n\r\n".data(using: .utf8)!)
-        body.append("\(empId ?? "")\r\n".data(using: .utf8)!)
+        body.append("\(empId)\r\n".data(using: .utf8)!)
 
         // Final boundary
         body.append("--\(boundary)--\r\n".data(using: .utf8)!)
@@ -624,8 +548,32 @@ class NetworkManager: NSObject {
             }
         }.resume()
     }
-
-
+    
+    static func getChecklistQuestions(completion:@escaping (_ data:[Question]?, _ error:String) -> Void){
+        let params:[String:Any] = ["empId":DataStore.shared.userInfo?.employeeId ?? ""]
+        let route = "/api/smartaccess/frsvalidation/questionnaire"
+        self.call(route: route, requestType: "POST", requestBody: params, MultipartRequest:true) { error, result in
+            if let error = error{
+                completion(nil, error)
+            }
+            // Ensure we have valid Data in result
+            guard let data = result as? Data else {
+                completion(nil, "No valid data received")
+                return
+            }
+            do {
+                // Convert the bytes data into a JSON dictionary
+                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                    let questions = parseQuestions(from: json)
+                    completion(questions,"")
+                } else {
+                    completion(nil, "Unexpected JSON format")
+                }
+            } catch {
+                completion(nil, "Failed to parse JSON: \(error.localizedDescription)")
+            }
+        }
+    }
 }
 
 extension Data {
