@@ -30,6 +30,9 @@ class UserDetailsViewController: UIViewController {
     @IBAction func onTapNext(_ sender: Any) {
         let faceIDVC = self.storyboard?.instantiateViewController(withIdentifier: "FaceBlinkViewController") as? FaceBlinkViewController
         self.navigationController?.pushViewController(faceIDVC!, animated: true)
+        
+//        let faceIDVC = self.storyboard?.instantiateViewController(withIdentifier: "QuestionsViewController") as? QuestionsViewController
+//        self.navigationController?.pushViewController(faceIDVC!, animated: true)
     }
     
     func bindDeviceData(){
@@ -91,6 +94,7 @@ extension UserDetailsViewController:UITableViewDelegate,UITableViewDataSource{
             } else {
                 dropDownCell?.nameLbl.text = "\(keyString)"
             }
+            dropDownCell?.selectionStyle = .none
             dropDownCell?.contentView.isUserInteractionEnabled = true
             dropDownCell?.isUserInteractionEnabled = true
 

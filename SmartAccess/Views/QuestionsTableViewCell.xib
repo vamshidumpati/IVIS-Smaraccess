@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="QuestionsTableViewCell" rowHeight="248" id="KGk-i7-Jjw" customClass="QuestionsTableViewCell" customModule="SmartAccess" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="538" height="248"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="538" height="248"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="5tm-FI-gJO">
+                        <rect key="frame" x="10" y="10" width="518" height="228"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Date of joining?" textAlignment="natural" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TcK-fM-1bt">
+                                <rect key="frame" x="15" y="8.9999999999999982" width="118" height="20.333333333333329"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacing="15" translatesAutoresizingMaskIntoConstraints="NO" id="Oki-Hy-r4g">
+                                <rect key="frame" x="20" y="39.333333333333329" width="478" height="178.66666666666669"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="n9f-r1-65k">
+                                        <rect key="frame" x="0.0" y="0.0" width="478" height="49.666666666666664"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oy3-cc-wLr">
+                                        <rect key="frame" x="0.0" y="64.666666666666657" width="478" height="49.333333333333343"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oX7-Pu-HOc">
+                                        <rect key="frame" x="0.0" y="129" width="478" height="49.666666666666657"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                    </button>
+                                </subviews>
+                            </stackView>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="TcK-fM-1bt" firstAttribute="leading" secondItem="5tm-FI-gJO" secondAttribute="leading" constant="15" id="CZo-9a-oCt"/>
+                            <constraint firstItem="Oki-Hy-r4g" firstAttribute="leading" secondItem="5tm-FI-gJO" secondAttribute="leading" constant="20" id="EaB-yL-9QX"/>
+                            <constraint firstItem="TcK-fM-1bt" firstAttribute="top" secondItem="5tm-FI-gJO" secondAttribute="top" constant="9" id="F1X-vU-GCT"/>
+                            <constraint firstItem="Oki-Hy-r4g" firstAttribute="top" secondItem="TcK-fM-1bt" secondAttribute="bottom" constant="10" id="Jjs-b6-jqu"/>
+                            <constraint firstAttribute="trailing" secondItem="Oki-Hy-r4g" secondAttribute="trailing" constant="20" id="UTP-k4-6zA"/>
+                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="TcK-fM-1bt" secondAttribute="trailing" constant="5" id="dfC-aI-d8S"/>
+                            <constraint firstAttribute="bottom" secondItem="Oki-Hy-r4g" secondAttribute="bottom" constant="10" id="ffE-Go-yiq"/>
+                        </constraints>
+                    </view>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="5tm-FI-gJO" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="10" id="Bq1-Jl-hIu"/>
+                    <constraint firstAttribute="trailing" secondItem="5tm-FI-gJO" secondAttribute="trailing" constant="10" id="dEw-bg-DyH"/>
+                    <constraint firstItem="5tm-FI-gJO" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="10" id="fmb-tL-OBG"/>
+                    <constraint firstAttribute="bottom" secondItem="5tm-FI-gJO" secondAttribute="bottom" constant="10" id="qI5-TZ-jfq"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <connections>
+                <outlet property="firstBtn" destination="n9f-r1-65k" id="vXs-dr-Cpu"/>
+                <outlet property="questionsStackView" destination="Oki-Hy-r4g" id="8Kv-R9-FJz"/>
+                <outlet property="secondBtn" destination="oy3-cc-wLr" id="TfT-C7-Zis"/>
+                <outlet property="subView" destination="5tm-FI-gJO" id="hek-hH-rBo"/>
+                <outlet property="thirdBtn" destination="oX7-Pu-HOc" id="gCg-Kh-vYX"/>
+            </connections>
+            <point key="canvasLocation" x="258.01526717557249" y="91.549295774647888"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

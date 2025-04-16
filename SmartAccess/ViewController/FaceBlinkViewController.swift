@@ -225,7 +225,9 @@ class FaceBlinkViewController: UIViewController, AVCaptureVideoDataOutputSampleB
         capturedImageView.isHidden = true
         self.view.sendSubviewToBack(retakeBtn)
         self.view.sendSubviewToBack(doneBtn)
-        faceBoundaryView.isHidden = false
+//        if let boundaryView = self.faceBoundaryView {
+//            boundaryView.isHidden = false
+//        }
         isBlinkDetected = false
         lastEyeState = (false, false)
         statusLabel.text = "Align your face with the guide"
@@ -257,44 +259,15 @@ class FaceBlinkViewController: UIViewController, AVCaptureVideoDataOutputSampleB
     }
     
     @IBAction func validateFaceAction(_ sender: Any) {
-        if let image = lastCapturedImage,
-           let imageData = image.compress(toMaxSizeKB: 450) {
-
-            // Save image to temporary directory
-            let tempDirectory = FileManager.default.temporaryDirectory
-            let fileName = "compressed_photo.jpg"
-            let fileURL = tempDirectory.appendingPathComponent(fileName)
-            
-            do {
-                try imageData.write(to: fileURL)
-
-                // Prepare parameters for multipart form
-                let parameters: [[String: Any]] = [
-                    [
-                        "key": "photo",
-                        "src": fileURL.path,
-                        "type": "file"
-                    ],
-                    [
-                        "key": "empId",
-                        "value": DataStore.shared.userAuth?.results.employeeId ?? "",
-                        "type": "text"
-                    ]
-                ]
-                let route = "\(Environment.baseURL)" + "/api/smartaccess/frsvalidation/validateFace"
-                NetworkManager.uploadFaceValidationData(parameters: parameters, urlString: route) {result in
-                    switch result {
-                        case .success(let json):
-                            print("✅ JSON Response: \(json)")
-                        case .failure(let error):
-                            print("❌ Error: \(error.localizedDescription)")
-                        }
-                }
-            } catch {
-                print("Error writing image to disk: \(error)")
+        guard let capturedImage = capturedImageView.image else { return }
+        NetworkManager.validateFace(image: capturedImage, completion: { result in
+            switch result {
+            case .success(let json):
+                print("✅ Face validated: \(json)")
+            case .failure(let error):
+                print("❌ Validation failed: \(error.localizedDescription)")
             }
-        }
+        })
     }
-    
 }
 

@@ -562,6 +562,70 @@ class NetworkManager: NSObject {
         }
         task.resume()
     }
+    
+    
+    static func validateFace(image: UIImage,completion: @escaping (Result<[String: Any], Error>) -> Void) {
+        let tokenId = DataStore.shared.userAuth?.results.accessToken ?? ""
+        let empId = DataStore.shared.userInfo?.employeeId ?? ""
+        let customerId = DataStore.shared.userAuth?.results.mappedCustomers[0].pkCustomerId.description ?? ""
+        let urlString = "\(Environment.baseURL)/api/smartaccess/frsvalidation/validateFace"
+        guard let url = URL(string: urlString) else {
+            completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])))
+            return
+        }
+
+        let boundary = "Boundary-\(UUID().uuidString)"
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(tokenId)", forHTTPHeaderField: "Authorization")
+        request.setValue(customerId, forHTTPHeaderField: "Customer-Id")
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+
+        var body = Data()
+
+        // Add image part (corrected)
+        if let imageData = image.fixOrientation().jpegData(compressionQuality: 0.8) {
+            body.append("--\(boundary)\r\n".data(using: .utf8)!)
+            body.append("Content-Disposition: form-data; name=\"photo\"; filename=\"face_\(Int(Date().timeIntervalSince1970)).jpg\"\r\n".data(using: .utf8)!)
+            body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
+            body.append(imageData)
+            body.append("\r\n".data(using: .utf8)!)
+        }
+
+        // Add other fields
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"empId\"\r\n\r\n".data(using: .utf8)!)
+        body.append("\(empId ?? "")\r\n".data(using: .utf8)!)
+
+        // Final boundary
+        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+
+        request.httpBody = body
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+
+            guard let data = data else {
+                completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
+                return
+            }
+
+            do {
+                if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                    completion(.success(json))
+                } else {
+                    completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response format"])))
+                }
+            } catch {
+                completion(.failure(error))
+            }
+        }.resume()
+    }
+
+
 }
 
 extension Data {
