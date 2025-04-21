@@ -7,18 +7,24 @@
 
 struct Question {
     let questionName: String
-    let answers: [String]
+    var answers: [AnswerOption]
+}
+
+struct AnswerOption{
+    var answer:String
+    var isSelected:Bool
 }
 
 func parseQuestions(from json: [String: Any]) -> [Question] {
     var questions: [Question] = []
     
     for (key, value) in json {
-        if let answers = value as? [String] {
-            let question = Question(questionName: key, answers: answers)
-            questions.append(question)
-        }
-    }
+           if let answerStrings = value as? [String] {
+               let answerOptions = answerStrings.map { AnswerOption(answer: $0, isSelected: false) }
+               let question = Question(questionName: key, answers: answerOptions)
+               questions.append(question)
+           }
+       }
     
     return questions
 }

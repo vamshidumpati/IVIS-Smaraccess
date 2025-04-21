@@ -10,6 +10,7 @@
 		8835290B2DAD10B5006CB9BC /* PanModal in Frameworks */ = {isa = PBXBuildFile; productRef = 8835290A2DAD10B5006CB9BC /* PanModal */; };
 		887511512DA6734A00450B37 /* IQKeyboardManagerSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 887511502DA6734A00450B37 /* IQKeyboardManagerSwift */; };
 		887511542DA6739700450B37 /* SVProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 887511532DA6739700450B37 /* SVProgressHUD */; };
+		88968BC82DAFDBE9008BD7A6 /* IQKeyboardManagerSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 88968BC72DAFDBE9008BD7A6 /* IQKeyboardManagerSwift */; };
 		978767BCDF9B0CF42EBBEFBD /* Pods_SmartAccess.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 439954D9602FAF95A24C19C7 /* Pods_SmartAccess.framework */; };
 /* End PBXBuildFile section */
 
@@ -62,6 +63,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				88968BC82DAFDBE9008BD7A6 /* IQKeyboardManagerSwift in Frameworks */,
 				8835290B2DAD10B5006CB9BC /* PanModal in Frameworks */,
 				887511542DA6739700450B37 /* SVProgressHUD in Frameworks */,
 				978767BCDF9B0CF42EBBEFBD /* Pods_SmartAccess.framework in Frameworks */,
@@ -192,9 +194,9 @@
 			mainGroup = 88D9A8332D9CFBF1005485A6;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				88813E952DA587FE0032EF37 /* XCRemoteSwiftPackageReference "IQKeyboardManager" */,
 				887511522DA6739700450B37 /* XCRemoteSwiftPackageReference "SVProgressHUD" */,
 				883529092DAD10B5006CB9BC /* XCRemoteSwiftPackageReference "PanModal" */,
+				88968BC62DAFDBE9008BD7A6 /* XCRemoteSwiftPackageReference "IQKeyboardManager" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 88D9A83D2D9CFBF2005485A6 /* Products */;
@@ -284,23 +286,24 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 2DC96B9Q8N;
+				DEVELOPMENT_TEAM = 24KD3VN7KC;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SmartAccess/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "$(APP_NAME)";
-				INFOPLIST_KEY_NSCameraUsageDescription = "We need access to the camera to detect face and blinking";
+				INFOPLIST_KEY_CFBundleDisplayName = "Smart Access";
+				INFOPLIST_KEY_NSCameraUsageDescription = "We need camera access for face detection";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.app.hsense;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ml.ccmca;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -317,23 +320,24 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 2DC96B9Q8N;
+				DEVELOPMENT_TEAM = 24KD3VN7KC;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SmartAccess/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "$(APP_NAME)";
-				INFOPLIST_KEY_NSCameraUsageDescription = "We need access to the camera to detect face and blinking";
+				INFOPLIST_KEY_CFBundleDisplayName = "Smart Access";
+				INFOPLIST_KEY_NSCameraUsageDescription = "We need camera access for face detection";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.app.hsense;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ml.ccmca;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -553,6 +557,14 @@
 				minimumVersion = 8.0.1;
 			};
 		};
+		88968BC62DAFDBE9008BD7A6 /* XCRemoteSwiftPackageReference "IQKeyboardManager" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hackiftekhar/IQKeyboardManager.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -570,6 +582,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 887511522DA6739700450B37 /* XCRemoteSwiftPackageReference "SVProgressHUD" */;
 			productName = SVProgressHUD;
+		};
+		88968BC72DAFDBE9008BD7A6 /* IQKeyboardManagerSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 88968BC62DAFDBE9008BD7A6 /* XCRemoteSwiftPackageReference "IQKeyboardManager" */;
+			productName = IQKeyboardManagerSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

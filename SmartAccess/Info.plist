@@ -45,7 +45,5 @@
 			</array>
 		</dict>
 	</dict>
-	<key>NSCameraUsageDescription</key>
-	<string>We need camera access for face detection</string>
 </dict>
 </plist>

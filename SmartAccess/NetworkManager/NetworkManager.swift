@@ -488,13 +488,13 @@ class NetworkManager: NSObject {
         }
     }
     
-    static func validateFace(image: UIImage,completion: @escaping (Result<[String: Any], Error>) -> Void) {
+    static func validateFace(image: UIImage,completion: @escaping (_ response:[String: Any]?, _ error:String?) -> Void) {
         let tokenId = DataStore.shared.userAuth?.results.accessToken ?? ""
         let empId = DataStore.shared.userInfo?.employeeId ?? ""
         let customerId = DataStore.shared.userAuth?.results.mappedCustomers[0].pkCustomerId.description ?? ""
         let urlString = "\(Environment.baseURL)/api/smartaccess/frsvalidation/validateFace"
         guard let url = URL(string: urlString) else {
-            completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])))
+            completion(nil,"Invalid URL")
             return
         }
 
@@ -528,23 +528,23 @@ class NetworkManager: NSObject {
 
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
-                completion(.failure(error))
+                completion(nil,error.localizedDescription)
                 return
             }
 
             guard let data = data else {
-                completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
+                completion(nil,"Data is not valid")
                 return
             }
 
             do {
                 if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
-                    completion(.success(json))
+                    completion(json,nil)
                 } else {
-                    completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response format"])))
+                    completion(nil,error.debugDescription)
                 }
             } catch {
-                completion(.failure(error))
+                completion(nil,"Failed to parse the data")
             }
         }.resume()
     }
@@ -566,6 +566,55 @@ class NetworkManager: NSObject {
                 if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
                     let questions = parseQuestions(from: json)
                     completion(questions,"")
+                } else {
+                    completion(nil, "Unexpected JSON format")
+                }
+            } catch {
+                completion(nil, "Failed to parse JSON: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    static func submitAnswers(params:[String:Any], vaultId:Int ,completion: @escaping( _ response:[String:Any], _ error:String) -> Void){
+        let route = "/api/vaults/validateQuestionnaire?vaultId=\(vaultId)"
+        self.call(route: route, requestType: "POST", requestBody: params) { error, result in
+            if let error = error{
+                completion([:], error)
+            }
+            // Ensure we have valid Data in result
+            guard let data = result as? Data else {
+                completion([:], "No valid data received")
+                return
+            }
+            do {
+                // Convert the bytes data into a JSON dictionary
+                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                    completion(json,"")
+                } else {
+                    completion([:], "Unexpected JSON format")
+                }
+            } catch {
+                completion([:], "Failed to parse JSON: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    static func sendOTP(completion:@escaping (_ data:[String:Any]?, _ error:String) -> Void){
+        let params:[String:Any] = ["empId":DataStore.shared.userInfo?.employeeId ?? ""]
+        let route = "/api/smartaccess/frsvalidation/getOTP"
+        self.call(route: route, requestType: "POST", requestBody: params, MultipartRequest:true) { error, result in
+            if let error = error{
+                completion(nil, error)
+            }
+            // Ensure we have valid Data in result
+            guard let data = result as? Data else {
+                completion(nil, "No valid data received")
+                return
+            }
+            do {
+                // Convert the bytes data into a JSON dictionary
+                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                    completion(json,"")
                 } else {
                     completion(nil, "Unexpected JSON format")
                 }

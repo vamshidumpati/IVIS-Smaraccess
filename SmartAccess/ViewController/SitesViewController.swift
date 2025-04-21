@@ -38,6 +38,7 @@ class SitesViewController: UIViewController {
         logoView.applyBottomBorderAndShadow()
     }
     
+    
     func bindSiteList() {
         guard let userName = DataStore.shared.userAuth?.results.username,
               let tokenStr = DataStore.shared.userAuth?.results.accessToken,

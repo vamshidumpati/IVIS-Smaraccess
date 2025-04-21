@@ -37,12 +37,25 @@ class QuestionsTableViewCell: UITableViewCell {
         let question =  questionName == "accessCodes" ? "Access code" : questionName == "datesOfBirth" ? "Date of birth" : questionName == "datesOfJoining" ? "Date of joining" : ""
         questionLbl.text = "Q. \(tag))" + question + "?"
         if !data.answers.isEmpty{
-            firstBtn.tag = 1
-            secondBtn.tag = 2
-            thirdBtn.tag = 3
-            firstBtn.setTitle(data.answers[0], for: .normal)
-            secondBtn.setTitle(data.answers[1], for: .normal)
-            thirdBtn.setTitle(data.answers[2], for: .normal)
+            firstBtn.tag = 0
+            secondBtn.tag = 1
+            thirdBtn.tag = 2
+            firstBtn.setTitle(data.answers[0].answer, for: .normal)
+            secondBtn.setTitle(data.answers[1].answer, for: .normal)
+            thirdBtn.setTitle(data.answers[2].answer, for: .normal)
+            if data.answers[0].isSelected{
+                firstBtn.backgroundColor = UIColor(hex: "#C0DBFF")
+                secondBtn.backgroundColor = .white
+                thirdBtn.backgroundColor = .white
+            }else if data.answers[1].isSelected{
+                secondBtn.backgroundColor = UIColor(hex: "#C0DBFF")
+                firstBtn.backgroundColor = .white
+                thirdBtn.backgroundColor = .white
+            }else if data.answers[2].isSelected{
+                firstBtn.backgroundColor = .white
+                secondBtn.backgroundColor = .white
+                thirdBtn.backgroundColor = UIColor(hex: "#C0DBFF")
+            }
         }
     }
     

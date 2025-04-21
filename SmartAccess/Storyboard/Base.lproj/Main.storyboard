@@ -9,6 +9,12 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <customFonts key="customFonts">
+        <array key="Lato-Bold.ttf">
+            <string>Lato-Bold</string>
+        </array>
+        <array key="Lato-Medium.ttf">
+            <string>Lato-Medium</string>
+        </array>
         <array key="Lato-Regular.ttf">
             <string>Lato-Regular</string>
         </array>
@@ -896,7 +902,7 @@
                                 </constraints>
                             </view>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="m6m-sL-fJx">
-                                <rect key="frame" x="0.0" y="126.33333333333331" width="393" height="628.66666666666674"/>
+                                <rect key="frame" x="0.0" y="147.33333333333331" width="393" height="607.66666666666674"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <connections>
                                     <outlet property="dataSource" destination="JJR-vd-kuw" id="hGF-4G-6q4"/>
@@ -904,7 +910,7 @@
                                 </connections>
                             </tableView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Please answer your security questions..." textAlignment="natural" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BjD-2K-aC1">
-                                <rect key="frame" x="16" y="102" width="307" height="19.333333333333329"/>
+                                <rect key="frame" x="16" y="108" width="307" height="19.333333333333329"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="16"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -947,9 +953,9 @@
                             <constraint firstItem="QVh-YE-EkI" firstAttribute="centerX" secondItem="TPN-39-I9o" secondAttribute="centerX" id="cI4-C8-vwJ"/>
                             <constraint firstItem="BjD-2K-aC1" firstAttribute="leading" secondItem="TPN-39-I9o" secondAttribute="leading" constant="16" id="cTh-hX-vKd"/>
                             <constraint firstItem="TPN-39-I9o" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="BjD-2K-aC1" secondAttribute="trailing" constant="5" id="d4n-xa-qnu"/>
-                            <constraint firstItem="m6m-sL-fJx" firstAttribute="top" secondItem="BjD-2K-aC1" secondAttribute="bottom" constant="5" id="fx0-Ew-8HJ"/>
+                            <constraint firstItem="m6m-sL-fJx" firstAttribute="top" secondItem="BjD-2K-aC1" secondAttribute="bottom" constant="20" id="fx0-Ew-8HJ"/>
                             <constraint firstItem="m6m-sL-fJx" firstAttribute="leading" secondItem="TPN-39-I9o" secondAttribute="leading" id="ksJ-Yn-if0"/>
-                            <constraint firstItem="BjD-2K-aC1" firstAttribute="top" secondItem="to7-Sw-Pl4" secondAttribute="bottom" constant="4" id="mHl-v4-aZ0"/>
+                            <constraint firstItem="BjD-2K-aC1" firstAttribute="top" secondItem="to7-Sw-Pl4" secondAttribute="bottom" constant="10" id="mHl-v4-aZ0"/>
                             <constraint firstItem="paH-VE-e7S" firstAttribute="centerY" secondItem="QVh-YE-EkI" secondAttribute="centerY" id="oiy-Tm-LMx"/>
                             <constraint firstItem="TPN-39-I9o" firstAttribute="trailing" secondItem="m6m-sL-fJx" secondAttribute="trailing" id="wcA-qN-IJ3"/>
                             <constraint firstItem="QVh-YE-EkI" firstAttribute="top" secondItem="m6m-sL-fJx" secondAttribute="bottom" constant="8" symbolic="YES" id="xln-5r-Q4U"/>
@@ -965,10 +971,130 @@
             </objects>
             <point key="canvasLocation" x="7974.8091603053435" y="-354.22535211267609"/>
         </scene>
+        <!--View Controller-->
+        <scene sceneID="fu6-c6-llP">
+            <objects>
+                <viewController storyboardIdentifier="OTPViewController" id="LWW-NC-V7O" customClass="OTPViewController" customModule="SmartAccess" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="ahz-Jd-ILR">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view alpha="0.5" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Sru-fs-anL">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="sqM-et-12P">
+                                <rect key="frame" x="45" y="318.66666666666669" width="303" height="240.00000000000006"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="OTP Validation" textAlignment="natural" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oFH-6V-NEq">
+                                        <rect key="frame" x="91.666666666666657" y="15.000000000000002" width="120" height="21.666666666666671"/>
+                                        <fontDescription key="fontDescription" name="Lato-Bold" family="Lato" pointSize="18"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Please wait for OTP" textAlignment="natural" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mDr-ph-22P">
+                                        <rect key="frame" x="14.999999999999993" y="51.666666666666629" width="104.33333333333331" height="14.666666666666671"/>
+                                        <fontDescription key="fontDescription" name="Lato-Medium" family="Lato" pointSize="12"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="OTP" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ZcM-Sm-YZ9">
+                                        <rect key="frame" x="15" y="83.666666666666629" width="273" height="40"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="40" id="aJF-jy-Shj"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits"/>
+                                    </textField>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dka-JK-Nhy">
+                                        <rect key="frame" x="15" y="140.66666666666663" width="273" height="40"/>
+                                        <color key="backgroundColor" red="0.086274509803921567" green="0.5725490196078431" blue="0.87450980392156863" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="40" id="II8-Wt-rUS"/>
+                                        </constraints>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="plain" title="Submit">
+                                            <fontDescription key="titleFontDescription" name="Lato-Heavy" family="Lato" pointSize="16"/>
+                                            <color key="baseForegroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </buttonConfiguration>
+                                        <connections>
+                                            <action selector="onTapSubmitOTP:" destination="LWW-NC-V7O" eventType="touchUpInside" id="idM-3M-Dn6"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gXo-FY-In2">
+                                        <rect key="frame" x="15" y="192.66666666666663" width="273" height="28.666666666666657"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="plain" title="Resend OTP in">
+                                            <fontDescription key="titleFontDescription" name="Lato-Regular" family="Lato" pointSize="12"/>
+                                            <color key="baseForegroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </buttonConfiguration>
+                                        <connections>
+                                            <action selector="onTapResendOTP:" destination="LWW-NC-V7O" eventType="touchUpInside" id="gZn-NK-kcN"/>
+                                        </connections>
+                                    </button>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="arrow.right" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="yho-Lo-NTf">
+                                        <rect key="frame" x="248" y="152.66666666666663" width="24" height="16"/>
+                                        <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="24" id="9Le-li-tUC"/>
+                                            <constraint firstAttribute="width" constant="24" id="b7P-4K-dyK"/>
+                                        </constraints>
+                                        <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="small" weight="medium"/>
+                                    </imageView>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstItem="ZcM-Sm-YZ9" firstAttribute="top" secondItem="mDr-ph-22P" secondAttribute="bottom" constant="17.333333333333329" id="3aN-el-AG7"/>
+                                    <constraint firstItem="dka-JK-Nhy" firstAttribute="trailing" secondItem="ZcM-Sm-YZ9" secondAttribute="trailing" id="5Cc-Kn-Ur5"/>
+                                    <constraint firstItem="mDr-ph-22P" firstAttribute="top" secondItem="oFH-6V-NEq" secondAttribute="bottom" constant="15" id="A1j-CA-d7j"/>
+                                    <constraint firstAttribute="trailing" secondItem="ZcM-Sm-YZ9" secondAttribute="trailing" constant="15" id="FRH-LQ-T1j"/>
+                                    <constraint firstAttribute="height" constant="240" id="GBh-4n-bey"/>
+                                    <constraint firstItem="gXo-FY-In2" firstAttribute="trailing" secondItem="dka-JK-Nhy" secondAttribute="trailing" id="IGI-SW-sS5"/>
+                                    <constraint firstItem="dka-JK-Nhy" firstAttribute="centerX" secondItem="sqM-et-12P" secondAttribute="centerX" id="Ofi-KH-dX0"/>
+                                    <constraint firstItem="yho-Lo-NTf" firstAttribute="leading" secondItem="dka-JK-Nhy" secondAttribute="trailing" constant="-40" id="Riw-Mt-am8"/>
+                                    <constraint firstItem="mDr-ph-22P" firstAttribute="leading" secondItem="sqM-et-12P" secondAttribute="leading" constant="15" id="TDP-as-SbZ"/>
+                                    <constraint firstAttribute="width" constant="303" id="ZJC-HH-bcn"/>
+                                    <constraint firstItem="gXo-FY-In2" firstAttribute="centerX" secondItem="sqM-et-12P" secondAttribute="centerX" id="bUX-6s-grF"/>
+                                    <constraint firstItem="gXo-FY-In2" firstAttribute="top" secondItem="dka-JK-Nhy" secondAttribute="bottom" constant="12" id="dLr-dA-1bu"/>
+                                    <constraint firstItem="gXo-FY-In2" firstAttribute="leading" secondItem="dka-JK-Nhy" secondAttribute="leading" id="fag-p5-69T"/>
+                                    <constraint firstItem="ZcM-Sm-YZ9" firstAttribute="leading" secondItem="sqM-et-12P" secondAttribute="leading" constant="15" id="gWf-4P-Ptd"/>
+                                    <constraint firstItem="oFH-6V-NEq" firstAttribute="top" secondItem="sqM-et-12P" secondAttribute="top" constant="15" id="pOA-ln-rAD"/>
+                                    <constraint firstItem="dka-JK-Nhy" firstAttribute="top" secondItem="ZcM-Sm-YZ9" secondAttribute="bottom" constant="17" id="rgL-fK-R7c"/>
+                                    <constraint firstItem="dka-JK-Nhy" firstAttribute="leading" secondItem="ZcM-Sm-YZ9" secondAttribute="leading" id="t6c-oB-Wqn"/>
+                                    <constraint firstItem="oFH-6V-NEq" firstAttribute="centerX" secondItem="sqM-et-12P" secondAttribute="centerX" id="t9J-yl-Feo"/>
+                                    <constraint firstItem="yho-Lo-NTf" firstAttribute="centerY" secondItem="dka-JK-Nhy" secondAttribute="centerY" id="tQw-qn-wPE"/>
+                                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="mDr-ph-22P" secondAttribute="trailing" constant="5" id="tVz-FH-BVj"/>
+                                    <constraint firstItem="ZcM-Sm-YZ9" firstAttribute="centerX" secondItem="sqM-et-12P" secondAttribute="centerX" id="wBO-W5-YI2"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="5EV-Ca-EdC"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="sqM-et-12P" firstAttribute="centerX" secondItem="5EV-Ca-EdC" secondAttribute="centerX" id="GfM-Pu-TdR"/>
+                            <constraint firstItem="Sru-fs-anL" firstAttribute="top" secondItem="ahz-Jd-ILR" secondAttribute="top" id="VTo-si-89O"/>
+                            <constraint firstItem="5EV-Ca-EdC" firstAttribute="trailing" secondItem="Sru-fs-anL" secondAttribute="trailing" id="Y7P-gh-4d5"/>
+                            <constraint firstAttribute="bottom" secondItem="Sru-fs-anL" secondAttribute="bottom" id="bfi-iJ-PtI"/>
+                            <constraint firstItem="Sru-fs-anL" firstAttribute="leading" secondItem="5EV-Ca-EdC" secondAttribute="leading" id="eQG-bc-CkL"/>
+                            <constraint firstItem="sqM-et-12P" firstAttribute="centerY" secondItem="5EV-Ca-EdC" secondAttribute="centerY" id="vho-SZ-lzK"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="OTPTextField" destination="ZcM-Sm-YZ9" id="bVH-mW-021"/>
+                        <outlet property="resendBtn" destination="gXo-FY-In2" id="MGD-oJ-dyE"/>
+                        <outlet property="submitBtn" destination="dka-JK-Nhy" id="qwz-ah-0eI"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="O27-p1-rbE" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="8849.6183206106871" y="-354.22535211267609"/>
+        </scene>
     </scenes>
     <resources>
         <image name="app_logout" width="29" height="29"/>
         <image name="arrow.forward" catalog="system" width="128" height="95"/>
+        <image name="arrow.right" catalog="system" width="128" height="95"/>
         <image name="building.fill" catalog="system" width="90" height="128"/>
         <image name="camera" width="45" height="45"/>
         <image name="capturephoto" width="90" height="90"/>

@@ -8,6 +8,7 @@
 import UIKit
 import AVFoundation
 import Vision
+import SVProgressHUD
 
 class FaceBlinkViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
     @IBOutlet weak var captureView: UIView!
@@ -37,6 +38,7 @@ class FaceBlinkViewController: UIViewController, AVCaptureVideoDataOutputSampleB
     }
 
     func setupUI() {
+        self.statusLabel.font = UIFont(name: "Lato-Bold", size: 14.0)
         self.captureBtn.layer.cornerRadius = self.captureBtn.frame.width / 2
         self.captureBtn.isHidden = true
         self.retakeBtn.isHidden = true
@@ -242,6 +244,10 @@ class FaceBlinkViewController: UIViewController, AVCaptureVideoDataOutputSampleB
     }
     
     @IBAction func onCaptureTapped(_ sender: UIButton) {
+        self.retryFaceValidation()
+    }
+    
+    func retryFaceValidation(){
         guard let buffer = currentSampleBuffer,
               let image = imageFromSampleBuffer(buffer) else { return }
         faceBoundaryView.isHidden = true
@@ -260,18 +266,38 @@ class FaceBlinkViewController: UIViewController, AVCaptureVideoDataOutputSampleB
     
     @IBAction func validateFaceAction(_ sender: Any) {
         guard let capturedImage = capturedImageView.image else { return }
-        NetworkManager.validateFace(image: capturedImage, completion: { result in
-            switch result {
-            case .success(_):
-                self.fetchChecklistQuestions()
-            case .failure(let error):
-                print("❌ Validation failed: \(error.localizedDescription)")
+        SVProgressHUD.show()
+        NetworkManager.validateFace(image: capturedImage) { result, error in
+            SVProgressHUD.dismiss()
+            DispatchQueue.main.async {
+                if let error = error {
+                    self.displayAlert(title: "Error", message: error)
+                    return
+                }
+
+                guard let data = result?["data"] as? String else {
+                    self.displayAlert(title: "Error", message: "Unexpected response from server.")
+                    return
+                }
+
+                if data == "Valid" {
+                    self.fetchChecklistQuestions()
+                } else if data == "Invalid" {
+                    self.statusLabel.isHidden = false
+                    self.statusLabel.textColor = .red
+                    self.statusLabel.text = "Error in face validation, please retry"
+                    self.view.bringSubviewToFront(self.statusLabel)
+                } else {
+                    self.displayAlert(title: "Error", message: "Unknown validation status.")
+                }
             }
-        })
+        }
     }
     
     func fetchChecklistQuestions(){
+        SVProgressHUD.show()
         NetworkManager.getChecklistQuestions { data, error in
+            SVProgressHUD.dismiss()
             if error == ""{
                 self.navigateToQuestionsVC(questionsData: data ?? [])
             } else {
