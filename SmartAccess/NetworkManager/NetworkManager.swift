@@ -29,17 +29,18 @@ class NetworkManager: NSObject {
         request.httpMethod = requestType
         
         // Set common headers
-        let customerID = DataStore.shared.userAuth?.results.mappedCustomers[0].pkCustomerId
-        let fkTenantId = DataStore.shared.userAuth?.results.mappedCustomers[0].fkTenantId
+        let customerID = DataStore.shared.userAuth?.mappedCustomers?[0].pkCustomerId
+        let customerName = DataStore.shared.userAuth?.mappedCustomers?[0].customerName
+        let fkTenantId = DataStore.shared.userAuth?.mappedCustomers?[0].fkTenantId
         request.setValue(fkTenantId?.description ?? "null", forHTTPHeaderField: "Tenant-Id")
         request.setValue(customerID?.description ?? "null", forHTTPHeaderField: "Customer-Id")
         
         if MultipartRequest == false {
             // Original JSON request handling
-            let siteID = DataStore.shared.userAuth?.results.mappedGroups[0].siteId
-            let siteGroupID = DataStore.shared.userAuth?.results.mappedGroups[0].siteGroupId
-            let loginID = DataStore.shared.userAuth?.results.username
-            let accessToken = DataStore.shared.userAuth?.results.accessToken ?? ""
+            let siteID = DataStore.shared.userAuth?.mappedGroups?[0].siteId
+            let siteGroupID = DataStore.shared.userAuth?.mappedGroups?[0].siteGroupId
+            let loginID = DataStore.shared.userAuth?.username
+            let accessToken = DataStore.shared.userAuth?.accessToken ?? ""
             
             request.setValue(siteGroupID?.description ?? "null", forHTTPHeaderField: "Sitegroup-Id")
             request.setValue(loginID?.description ?? "null", forHTTPHeaderField: "Login-Id")
@@ -70,7 +71,7 @@ class NetworkManager: NSObject {
             
             // Add authorization headers if needed
             if includeAuthHeaders {
-                let accessToken = DataStore.shared.userAuth?.results.accessToken ?? ""
+                let accessToken = DataStore.shared.userAuth?.accessToken ?? ""
                 request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             }
             
@@ -185,7 +186,7 @@ class NetworkManager: NSObject {
     
     
     //MARK: - GET User Token
-    static func getUserToken(username: String, password:String,accontId:String ,completionBlock: @escaping (_ result: User?, _ error: String?) -> Void) {
+    static func getUserToken(username: String, password:String,accontId:String ,completionBlock: @escaping (_ result: UserData?, _ error: String?) -> Void) {
         var params = [String:String]()
         var getTokenRoute = ""
         let requestFlag = false
@@ -201,19 +202,37 @@ class NetworkManager: NSObject {
             }
             if let data = data {
                 do {
-                    let res = try JSONDecoder().decode(User.self, from: data as! Data)
-                    DataStore.shared.userAuth = res
-                    completionBlock(res, nil)
+                    // Print raw JSON for debugging
+                    if let jsonString = String(data: data as! Data, encoding: .utf8) {
+                        print("Raw JSON Response: \(jsonString)")
+                    }
+                    
+                    let decoder = JSONDecoder()
+                    decoder.keyDecodingStrategy = .convertFromSnakeCase // Handles snake_case → camelCase
+                    
+                    let res = try decoder.decode(UserData.self, from: data as! Data)
+                    
+                    if let errorMessage = res.errorMessage, !errorMessage.isEmpty && errorMessage != "Login Authenticated"{
+                        completionBlock(res, errorMessage)
+                    } else if let userAuth = res.results {
+                        DataStore.shared.userAuth = userAuth
+                        completionBlock(res, nil)
+                    } else {
+                        completionBlock(nil, "No valid data found in response")
+                    }
                 } catch let error {
-                    completionBlock(nil, error.localizedDescription)
+                    print("Decoding Error: \(error)")
+                    completionBlock(nil, "Failed to parse response: \(error.localizedDescription)")
                 }
+            } else {
+                completionBlock(nil, "No data received from server")
             }
         }
     }
     
     //MARK: - Refresh Token
     static func refreshToken(route:String, requestType: String, requestBody:[String:Any]?, includeAuthHeaders:Bool, completionBlock: @escaping (_ error: String?, _ result: Any?) -> Void) {
-        let refreshToken = DataStore.shared.userAuth?.results.refreshToken ?? ""
+        let refreshToken = DataStore.shared.userAuth?.refreshToken ?? ""
         var refreshTokenRoute = ""
         var params:[String : Any] = [:]
         var requestType = ""
@@ -489,9 +508,9 @@ class NetworkManager: NSObject {
     }
     
     static func validateFace(image: UIImage,completion: @escaping (_ response:[String: Any]?, _ error:String?) -> Void) {
-        let tokenId = DataStore.shared.userAuth?.results.accessToken ?? ""
+        let tokenId = DataStore.shared.userAuth?.accessToken ?? ""
         let empId = DataStore.shared.userInfo?.employeeId ?? ""
-        let customerId = DataStore.shared.userAuth?.results.mappedCustomers[0].pkCustomerId.description ?? ""
+        let customerId = DataStore.shared.userAuth?.mappedCustomers?[0].pkCustomerId?.description ?? ""
         let urlString = "\(Environment.baseURL)/api/smartaccess/frsvalidation/validateFace"
         guard let url = URL(string: urlString) else {
             completion(nil,"Invalid URL")
@@ -550,8 +569,9 @@ class NetworkManager: NSObject {
     }
     
     static func getChecklistQuestions(completion:@escaping (_ data:[Question]?, _ error:String) -> Void){
-        let params:[String:Any] = ["empId":DataStore.shared.userInfo?.employeeId ?? ""]
-        let route = "/api/smartaccess/frsvalidation/questionnaire"
+        let params:[String:Any] = ["empId":DataStore.shared.userInfo?.employeeId ?? "",
+                                   "vaultId":DataStore.shared.vaultData?.ivisVault?.pkVaultId ?? 0]
+        let route = "/api/vaults/questionnaire"
         self.call(route: route, requestType: "POST", requestBody: params, MultipartRequest:true) { error, result in
             if let error = error{
                 completion(nil, error)
@@ -600,9 +620,63 @@ class NetworkManager: NSObject {
     }
     
     static func sendOTP(completion:@escaping (_ data:[String:Any]?, _ error:String) -> Void){
-        let params:[String:Any] = ["empId":DataStore.shared.userInfo?.employeeId ?? ""]
-        let route = "/api/smartaccess/frsvalidation/getOTP"
+        let params:[String:Any] = ["empId":DataStore.shared.userInfo?.employeeId ?? "",
+                                   "deviceId":DataStore.shared.vaultData?.ivisVault?.unit?.ivisunitId ?? "",
+                                   "mobileNo":DataStore.shared.userAuth?.mobilePhone ?? "",
+                                   "accessCode":DataStore.shared.userInfo?.accessCode ?? ""]
+        let route = "/api/smartaccess/frsvalidation/getOTPSMS"
         self.call(route: route, requestType: "POST", requestBody: params, MultipartRequest:true) { error, result in
+            if let error = error{
+                completion(nil, error)
+            }
+            // Ensure we have valid Data in result
+            guard let data = result as? Data else {
+                completion(nil, "No valid data received")
+                return
+            }
+            do {
+                // Convert the bytes data into a JSON dictionary
+                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                    completion(json,"")
+                } else {
+                    completion(nil, "Unexpected JSON format")
+                }
+            } catch {
+                completion(nil, "Failed to parse JSON: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    static func validateOTP(params:[String:Any],completion:@escaping (_ data:[String:Any]?, _ error:String) -> Void){
+        let route = "/api/smartaccess/frsvalidation/validatesOTP"
+        self.call(route: route, requestType: "POST", requestBody: params) { error, result in
+            if let error = error{
+                completion(nil, error)
+            }
+            // Ensure we have valid Data in result
+            guard let data = result as? Data else {
+                completion(nil, "No valid data received")
+                return
+            }
+            do {
+                // Convert the bytes data into a JSON dictionary
+                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                    completion(json,"")
+                } else {
+                    completion(nil, "Unexpected JSON format")
+                }
+            } catch {
+                completion(nil, "Failed to parse JSON: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    
+    
+    
+    static func verifyMFAViaEmail(params:[String:Any],completion:@escaping (_ data:[String:Any]?, _ error:String) -> Void){
+        let route = "/api/clogin"
+        self.call(route: route, requestType: "POST", requestBody: params) { error, result in
             if let error = error{
                 completion(nil, error)
             }

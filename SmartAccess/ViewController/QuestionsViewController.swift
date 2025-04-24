@@ -39,7 +39,7 @@ class QuestionsViewController: UIViewController {
             }
         }
     }
-    
+
     func captureAnswer(questionIndex: Int, answerIndex: Int) {
         // Ensure we have a valid question
         guard var questionData = questions?[questionIndex] as? Question else { return }
@@ -84,6 +84,20 @@ class QuestionsViewController: UIViewController {
         let indexPath = IndexPath(row: questionIndex, section: 0)
         questionsTableView.reloadRows(at: [indexPath], with: .automatic)
     }
+    
+    func showAlertAndPopTo<T: UIViewController>(ofType type: T.Type, from currentVC: UIViewController, message: String, title: String = "Alert") {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+            // Find the target VC in the navigation stack
+            if let targetVC = currentVC.navigationController?.viewControllers.first(where: { $0 is T }) {
+                currentVC.navigationController?.popToViewController(targetVC, animated: true)
+            }
+        }))
+        
+        currentVC.present(alert, animated: true, completion: nil)
+    }
+
 
     
     @IBAction func onTapSubmitAnswers(_ sender: Any) {
@@ -97,20 +111,21 @@ class QuestionsViewController: UIViewController {
             NetworkManager.submitAnswers(params: answeredData, vaultId: vaultid) { response, error in
                 SVProgressHUD.dismiss()
                 if response["status"] as? Int ?? 0 == 400{
-                    self.displayAlert(title: "Error", message: "Personal details validation failed.")
+                    self.showAlertAndPopTo(ofType: ProfileViewController.self, from: self, message: "Personal details validation failed.")
                 } else if response["status"] as? Int ?? 0 == 200{
-                    self.presentOPTViewController()
+                    self.navigateToVaultAccess()
+                } else if response["status"] as? Int ?? 0 == 403{
+                    self.showAlertAndPopTo(ofType: ProfileViewController.self, from: self, message: "User is temporarily blocked. Try again after 10 minutes.")
                 }
             }
         }
     }
     
-    func presentOPTViewController(){
-        let vc = self.storyboard?.instantiateViewController(withIdentifier: "OTPViewController") as? OTPViewController
-        vc?.modalPresentationStyle = .overFullScreen
-        vc?.modalTransitionStyle = .crossDissolve
-        self.present(vc!, animated: true)
+    func navigateToVaultAccess(){
+        let vaultVC = self.storyboard?.instantiateViewController(withIdentifier: "VaultViewController") as? VaultViewController
+        self.navigationController?.pushViewController(vaultVC!, animated: true)
     }
+ 
 }
 
 extension QuestionsViewController:UITableViewDelegate,UITableViewDataSource{

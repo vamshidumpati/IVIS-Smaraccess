@@ -20,6 +20,7 @@ class LoginViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        //applyTextFieldDelegates()
         usernameTF.text = "Vamcdumpeta"
         passwordTF.text = "Apple@123"
     }
@@ -102,12 +103,19 @@ class LoginViewController: UIViewController {
         NetworkManager.getUserToken(username: usernameTF.text ?? "", password: passwordTF.text ?? "", accontId: accountId ?? "") { result, error in
             SVProgressHUD.dismiss()
             if error != nil{
-                self.displayAlert(title: "Error", message: error)
+                if result?.errorCode == "251"{
+                    self.navigatetoMFA(response: result?.errorMessage ?? "")
+                } else if result?.errorCode == "242"{
+                    
+                } else {
+                    self.displayAlert(title: "Error", message: error)
+                }
+                
+                return
             } else {
                 if result?.errorMessage == "Login Authenticated"{
                     if let loggedInUserData = result?.results{
-                        DataStore.shared.userAuth?.results = loggedInUserData
-                        self.saveUserDataToUserDefaults(user: result!)
+                        DataStore.shared.userAuth = loggedInUserData
                         self.NavigateToDashboard()
                     }
                 } else {
@@ -115,6 +123,13 @@ class LoginViewController: UIViewController {
                 }
             }
         }
+    }
+    
+    func navigatetoMFA(response:String?){
+        let mfaVC = self.storyboard?.instantiateViewController(withIdentifier: "MFAAuthenitcaionViewController") as? MFAAuthenitcaionViewController
+        mfaVC?.response = response
+        mfaVC?.loginDetails = ["loginId":usernameTF.text ?? "","password":passwordTF.text ?? ""]
+        self.navigationController?.pushViewController(mfaVC!, animated: true)
     }
     
     func saveUserDataToUserDefaults(user: User) {

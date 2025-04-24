@@ -40,11 +40,11 @@ class SitesViewController: UIViewController {
     
     
     func bindSiteList() {
-        guard let userName = DataStore.shared.userAuth?.results.username,
-              let tokenStr = DataStore.shared.userAuth?.results.accessToken,
-              let customerName = DataStore.shared.userAuth?.results.mappedCustomers[0].customerName,
-              let customerId =  DataStore.shared.userAuth?.results.mappedCustomers[0].pkCustomerId,
-              let fkTenantId =  DataStore.shared.userAuth?.results.mappedCustomers[0].fkTenantId else {
+        guard let userName = DataStore.shared.userAuth?.username,
+              let tokenStr = DataStore.shared.userAuth?.accessToken,
+              let customerName = DataStore.shared.userAuth?.mappedCustomers?[0].customerName,
+              let customerId =  DataStore.shared.userAuth?.mappedCustomers?[0].pkCustomerId,
+              let fkTenantId =  DataStore.shared.userAuth?.mappedCustomers?[0].fkTenantId else {
             return
         }
         SVProgressHUD.show()
@@ -70,7 +70,7 @@ class SitesViewController: UIViewController {
                 alert.addAction(UIAlertAction(title: "OK", style: .default))
                 self.present(alert, animated: true)
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2){
+            DispatchQueue.main.async {
                 SVProgressHUD.dismiss()
                 self.sitesTableView.reloadData()
             }

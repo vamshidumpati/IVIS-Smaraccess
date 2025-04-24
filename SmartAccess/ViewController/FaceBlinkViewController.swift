@@ -281,7 +281,7 @@ class FaceBlinkViewController: UIViewController, AVCaptureVideoDataOutputSampleB
                 }
 
                 if data == "Valid" {
-                    self.fetchChecklistQuestions()
+                    self.navigateToQuestionsVC()
                 } else if data == "Invalid" {
                     self.statusLabel.isHidden = false
                     self.statusLabel.textColor = .red
@@ -294,22 +294,9 @@ class FaceBlinkViewController: UIViewController, AVCaptureVideoDataOutputSampleB
         }
     }
     
-    func fetchChecklistQuestions(){
-        SVProgressHUD.show()
-        NetworkManager.getChecklistQuestions { data, error in
-            SVProgressHUD.dismiss()
-            if error == ""{
-                self.navigateToQuestionsVC(questionsData: data ?? [])
-            } else {
-                self.displayAlert(title: "Error", message: "Failed to fetch checklist questions")
-            }
-        }
-    }
-    
-    func navigateToQuestionsVC(questionsData:[Question]){
+    func navigateToQuestionsVC(){
         let storyBoard = UIStoryboard(name: "Main", bundle: nil)
         let questionsVC = storyBoard.instantiateViewController(withIdentifier: "QuestionsViewController") as? QuestionsViewController
-        questionsVC?.questions = questionsData
         self.navigationController?.pushViewController(questionsVC!, animated: true)
     }
 }

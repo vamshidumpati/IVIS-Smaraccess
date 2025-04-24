@@ -14,7 +14,7 @@ class VaultCollectionViewCell: UICollectionViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
+        checkBtn.isUserInteractionEnabled = false
     }
     
     func configureData(name:String){

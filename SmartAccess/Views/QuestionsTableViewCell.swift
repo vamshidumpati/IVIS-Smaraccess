@@ -35,7 +35,7 @@ class QuestionsTableViewCell: UITableViewCell {
         let questionName = data.questionName
         selectedTag = tag
         let question =  questionName == "accessCodes" ? "Access code" : questionName == "datesOfBirth" ? "Date of birth" : questionName == "datesOfJoining" ? "Date of joining" : ""
-        questionLbl.text = "Q. \(tag))" + question + "?"
+        questionLbl.text = "Q. \(tag+1))" + question + "?"
         if !data.answers.isEmpty{
             firstBtn.tag = 0
             secondBtn.tag = 1

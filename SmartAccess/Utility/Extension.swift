@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-extension UIViewController {
+extension UIViewController:@retroactive UITextFieldDelegate {
     func displayAlert(title: String?, message: String?) {
         let alert = UIAlertController(title: title ?? "title", message:message ?? "Message", preferredStyle: .alert)
         let okAction = UIAlertAction(title: NSLocalizedString("OK", comment: ""), style:.default, handler: nil)
@@ -45,6 +45,18 @@ extension UIViewController {
         UIViewController.attemptRotationToDeviceOrientation()
     }
     
+    public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        view.endEditing(true)
+        return true
+    }
+
+    func applyTextFieldDelegates() {
+        for subview in view.subviews {
+            if let textField = subview as? UITextField {
+                textField.delegate = self
+            }
+        }
+    }
     
     var isOnScreen: Bool{
         return self.isViewLoaded && view.window != nil
@@ -236,3 +248,4 @@ extension UserDefaults {
     
     // ... add setters for other properties following the same pattern
 }
+

@@ -15,6 +15,8 @@ class OTPViewController: UIViewController {
     
     var timer: Timer?
     var remainingSeconds = 30
+    
+    var isVaultVerified:((_ isVerifeid:Bool, _ error:String) -> Void)?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,7 +35,12 @@ class OTPViewController: UIViewController {
         SVProgressHUD.show()
         NetworkManager.sendOTP { data, error in
             SVProgressHUD.dismiss()
-            print(data)
+            if error == ""{
+                
+            } else {
+                self.displayAlert(title: "Error", message: error)
+            }
+            
         }
     }
 
@@ -67,8 +74,30 @@ class OTPViewController: UIViewController {
     }
 
     @IBAction func onTapSubmitOTP(_ sender: Any) {
-        // Handle OTP submission
+        guard let otp = OTPTextField.text?.trimmingCharacters(in: .whitespaces), !otp.isEmpty else {
+            self.displayAlert(title: "Invalid OTP", message: "Please enter OTP")
+            return
+        }
+
+        let params: [String: Any] = [
+            "empId": DataStore.shared.userInfo?.employeeId ?? "",
+            "deviceId": DataStore.shared.vaultData?.ivisVault?.unit?.ivisunitId ?? "",
+            "accessCode": DataStore.shared.userInfo?.accessCode ?? "",
+            "access_type": DataStore.shared.vaultData?.ivisVaultConfiguration?.authenticationType ?? "",
+            "user_type": DataStore.shared.vaultData?.userType ?? "",
+            "otp": otp
+        ]
+
+        NetworkManager.validateOTP(params: params) { data, error in
+            let isValid = (data?["otpStatus"] as? Bool) ?? false
+            let errorMessage = error.isEmpty ? data?["remarks"] as? String ?? "" : error.description
+
+            self.dismiss(animated: true) {
+                self.isVaultVerified?(isValid, errorMessage)
+            }
+        }
     }
+
 
     @IBAction func onTapResendOTP(_ sender: Any) {
         sendOTP()

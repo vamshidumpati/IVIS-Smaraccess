@@ -13,7 +13,7 @@ class ProfileViewController: UIViewController {
     @IBOutlet weak var nextBtn: UIButton!
     
     var selectedSite:Site?
-    let loggedUserName =  DataStore.shared.userAuth?.results.fullName ?? "User"
+    let loggedUserName =  DataStore.shared.userAuth?.fullName ?? "User"
     var selectedSegmentStr = ""
     var deviceInfo:[String:Any] = [:]
     var deviceStatus = ""
@@ -48,7 +48,7 @@ class ProfileViewController: UIViewController {
                 
                 // Second API call - Get Device Status
                 let params: [String: Any] = [
-                    "empId": DataStore.shared.userAuth?.results.employeeId ?? 0,
+                    "empId": DataStore.shared.userAuth?.employeeId ?? 0,
                     "deviceId": deviceId
                 ]
                 
